@@ -1,0 +1,52 @@
+//! bytecode2mlir - Convert Tile IR bytecode to MLIR text format
+
+use std::fs;
+use std::path::PathBuf;
+use clap::Parser;
+
+mod bytecode;
+mod cuda_tile_ir;
+mod decode;
+mod error;
+
+use decode::{decode_module, DecodeOptions};
+use cuda_tile_ir::printer::module_to_mlir_text;
+
+#[derive(Parser)]
+#[command(name = "bytecode2mlir")]
+#[command(about = "Convert Tile IR bytecode to MLIR text format")]
+struct Args {
+    /// Input TileIR bytecode file
+    input: PathBuf,
+
+    /// Output MLIR file
+    output: PathBuf,
+}
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args = Args::parse();
+
+    // Check if it's a valid bytecode file
+    let data = fs::read(&args.input)?;
+    if !bytecode::is_tilir_bytecode(&data) {
+        eprintln!("Error: '{}' is not a valid TileIR bytecode file", args.input.display());
+        std::process::exit(1);
+    }
+
+    // Parse bytecode to IR
+    let opts = DecodeOptions {
+        lazy_functions: false,
+        ..Default::default()
+    };
+
+    let ir_module = decode_module(&data, &opts)?;
+
+    // Convert to MLIR text
+    let mlir_text = module_to_mlir_text(&ir_module);
+
+    // Write to output file
+    fs::write(&args.output, mlir_text)?;
+    eprintln!("Successfully wrote MLIR to: {}", args.output.display());
+
+    Ok(())
+}
