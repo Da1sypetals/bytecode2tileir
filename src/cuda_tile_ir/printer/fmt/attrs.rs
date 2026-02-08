@@ -1,15 +1,15 @@
 use std::fmt::{self, Display};
 
-use crate::cuda_tile_ir::OpAttrKey;
 use crate::cuda_tile_ir::attrs::Attr;
 use crate::cuda_tile_ir::enums::{
     AtomicRMWMode, ComparisonOrdering, ComparisonPredicate, MemoryOrdering, MemoryScope,
     RoundingMode, Signedness,
 };
 use crate::cuda_tile_ir::ir::Operation;
+use crate::cuda_tile_ir::OpAttrKey;
 
-use super::super::Line;
 use super::super::ctx::PrinterCtx;
+use super::super::Line;
 use super::dense::fmt_float;
 
 pub fn fmt_assume_predicate(attr: &Attr) -> Option<String> {
@@ -177,20 +177,20 @@ impl Display for AtomicRMWMode {
     }
 }
 
-pub(in crate::cuda_tile_ir::printer) fn identity_literal(ctx: &PrinterCtx<'_>, attr: &Attr) -> String {
+pub(in crate::cuda_tile_ir::printer) fn identity_literal(
+    ctx: &PrinterCtx<'_>,
+    attr: &Attr,
+) -> String {
     match attr {
         Attr::Float { kind, bits } => {
             let value_bits = match kind {
-                crate::cuda_tile_ir::enums::FloatKind::F16 | crate::cuda_tile_ir::enums::FloatKind::BF16 => {
-                    (*bits) & 0xFFFF
-                }
-                crate::cuda_tile_ir::enums::FloatKind::F32 | crate::cuda_tile_ir::enums::FloatKind::TF32 => {
-                    (*bits) & 0xFFFF_FFFF
-                }
+                crate::cuda_tile_ir::enums::FloatKind::F16
+                | crate::cuda_tile_ir::enums::FloatKind::BF16 => (*bits) & 0xFFFF,
+                crate::cuda_tile_ir::enums::FloatKind::F32
+                | crate::cuda_tile_ir::enums::FloatKind::TF32 => (*bits) & 0xFFFF_FFFF,
                 crate::cuda_tile_ir::enums::FloatKind::F64 => *bits,
-                crate::cuda_tile_ir::enums::FloatKind::F8E4M3FN | crate::cuda_tile_ir::enums::FloatKind::F8E5M2 => {
-                    (*bits) & 0xFF
-                }
+                crate::cuda_tile_ir::enums::FloatKind::F8E4M3FN
+                | crate::cuda_tile_ir::enums::FloatKind::F8E5M2 => (*bits) & 0xFF,
             };
             let ty_str = match kind {
                 crate::cuda_tile_ir::enums::FloatKind::F16 => "f16",
@@ -220,7 +220,8 @@ pub(in crate::cuda_tile_ir::printer) fn identity_literal(ctx: &PrinterCtx<'_>, a
                         fmt_float(f as f64)
                     }
                 }
-                crate::cuda_tile_ir::enums::FloatKind::F32 | crate::cuda_tile_ir::enums::FloatKind::TF32 => {
+                crate::cuda_tile_ir::enums::FloatKind::F32
+                | crate::cuda_tile_ir::enums::FloatKind::TF32 => {
                     let b = value_bits as u32;
                     let f = f32::from_bits(b);
                     if !f.is_finite() {
@@ -237,7 +238,8 @@ pub(in crate::cuda_tile_ir::printer) fn identity_literal(ctx: &PrinterCtx<'_>, a
                         fmt_float(f)
                     }
                 }
-                crate::cuda_tile_ir::enums::FloatKind::F8E4M3FN | crate::cuda_tile_ir::enums::FloatKind::F8E5M2 => {
+                crate::cuda_tile_ir::enums::FloatKind::F8E4M3FN
+                | crate::cuda_tile_ir::enums::FloatKind::F8E5M2 => {
                     format!("0x{:02X}", value_bits as u8)
                 }
             };

@@ -3,11 +3,11 @@ use std::fmt;
 use crate::cuda_tile_ir::ir::Operation;
 use crate::cuda_tile_ir::{OpAttrKey, Opcode};
 
-use super::super::Line;
-use super::super::Printer;
 use super::super::ctx::PrinterCtx;
 use super::super::fmt::{attrs, types};
 use super::super::indent::MlirPrinter;
+use super::super::Line;
+use super::super::Printer;
 
 #[derive(Debug, Clone, Copy)]
 enum TypeSigPolicy {

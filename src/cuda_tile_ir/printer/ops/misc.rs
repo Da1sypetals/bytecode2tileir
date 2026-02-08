@@ -1,16 +1,16 @@
 use std::fmt;
 
-use crate::cuda_tile_ir::OpAttrKey;
 use crate::cuda_tile_ir::attrs::{Attr, DenseStorage};
 use crate::cuda_tile_ir::ids::ValueId;
 use crate::cuda_tile_ir::ir::Operation;
 use crate::cuda_tile_ir::types::{Dim, Type};
+use crate::cuda_tile_ir::OpAttrKey;
 
-use super::super::Line;
-use super::super::Printer;
 use super::super::escape::escape_mlir_string;
 use super::super::fmt::{attrs, dense, types};
 use super::super::indent::MlirPrinter;
+use super::super::Line;
+use super::super::Printer;
 use super::control_flow::print_region_with_block_args;
 
 pub(super) fn print_constant<W: MlirPrinter + ?Sized>(

@@ -1,11 +1,11 @@
 use std::fmt::{self, Display};
 
-use crate::cuda_tile_ir::OpAttrKey;
 use crate::cuda_tile_ir::attrs::Attr;
 use crate::cuda_tile_ir::cfg::Module;
 use crate::cuda_tile_ir::ids::{TypeId, ValueId};
 use crate::cuda_tile_ir::ir::Operation;
 use crate::cuda_tile_ir::types::Type;
+use crate::cuda_tile_ir::OpAttrKey;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct PrinterConfig {}
@@ -49,6 +49,6 @@ pub struct Slot(ValueId);
 
 impl Display for Slot {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "%{}", self.0.0)
+        write!(f, "%{}", self.0 .0)
     }
 }

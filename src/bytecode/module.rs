@@ -6,11 +6,11 @@ use crate::bytecode::decode_body::BodyDecoder;
 use crate::bytecode::error::{BytecodeError, Result};
 use crate::bytecode::file::BytecodeFile;
 use crate::bytecode::format::{
-    FuncId, SECTION_CONSTS, SECTION_DEBUG, SECTION_FUNCS, SECTION_GLOBALS, SECTION_STRINGS,
-    SECTION_TYPES, Version,
+    FuncId, Version, SECTION_CONSTS, SECTION_DEBUG, SECTION_FUNCS, SECTION_GLOBALS,
+    SECTION_STRINGS, SECTION_TYPES,
 };
-use crate::bytecode::funcs::{FunctionDecl, parse_function_table};
-use crate::bytecode::globals::{GlobalDecl, parse_global_table};
+use crate::bytecode::funcs::{parse_function_table, FunctionDecl};
+use crate::bytecode::globals::{parse_global_table, GlobalDecl};
 use crate::bytecode::strings::StringTable;
 use crate::bytecode::types::TypeTable;
 use crate::cuda_tile_ir::builder::IrBuilder;
@@ -95,12 +95,18 @@ impl<'a> BytecodeModule<'a> {
         self.funcs.get(id.0 as usize)
     }
 
-    pub fn intern_all_types(&mut self, arena: &mut crate::cuda_tile_ir::arena::IrArena) -> Result<()> {
+    pub fn intern_all_types(
+        &mut self,
+        arena: &mut crate::cuda_tile_ir::arena::IrArena,
+    ) -> Result<()> {
         if !arena.types.is_empty() {
             return Ok(());
         }
         for i in 0..self.ctx.types.len() {
-            let ty = self.ctx.types.get(crate::cuda_tile_ir::ids::TypeId(i as u32))?;
+            let ty = self
+                .ctx
+                .types
+                .get(crate::cuda_tile_ir::ids::TypeId(i as u32))?;
             arena.intern_type(ty);
         }
         Ok(())

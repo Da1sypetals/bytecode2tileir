@@ -3,7 +3,9 @@
 use crate::bytecode::format::ConstId;
 use crate::bytecode::funcs::FunctionFlags;
 use crate::cuda_tile_ir::debug::Location;
-use crate::cuda_tile_ir::ids::{AttrId, BlockId, FunctionId, GlobalId, OpId, RegionId, TypeId, ValueId};
+use crate::cuda_tile_ir::ids::{
+    AttrId, BlockId, FunctionId, GlobalId, OpId, RegionId, TypeId, ValueId,
+};
 
 #[derive(Debug, Clone)]
 pub struct Block {

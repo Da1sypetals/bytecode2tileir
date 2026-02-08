@@ -4,10 +4,10 @@ use crate::cuda_tile_ir::attrs::Attr;
 use crate::cuda_tile_ir::ir::Operation;
 use crate::cuda_tile_ir::{OpAttrKey, Opcode};
 
-use super::super::Line;
-use super::super::Printer;
 use super::super::fmt::{attrs, types};
 use super::super::indent::MlirPrinter;
+use super::super::Line;
+use super::super::Printer;
 
 #[derive(Debug, Clone, Copy)]
 struct OperandSegments {

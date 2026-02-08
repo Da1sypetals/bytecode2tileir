@@ -1,13 +1,13 @@
 use std::fmt;
 
-use crate::cuda_tile_ir::OpAttrKey;
 use crate::cuda_tile_ir::ids::ValueId;
 use crate::cuda_tile_ir::ir::Operation;
+use crate::cuda_tile_ir::OpAttrKey;
 
-use super::super::Line;
-use super::super::Printer;
 use super::super::fmt::{attrs, types};
 use super::super::indent::MlirPrinter;
+use super::super::Line;
+use super::super::Printer;
 use super::print_op;
 
 pub(super) fn print_region_ops<W: MlirPrinter + ?Sized>(

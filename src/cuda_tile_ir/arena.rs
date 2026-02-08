@@ -2,7 +2,9 @@
 
 use crate::cuda_tile_ir::attrs::Attr;
 use crate::cuda_tile_ir::cfg::{Block, Function, Global, Region};
-use crate::cuda_tile_ir::ids::{AttrId, BlockId, FunctionId, GlobalId, OpId, RegionId, TypeId, ValueId};
+use crate::cuda_tile_ir::ids::{
+    AttrId, BlockId, FunctionId, GlobalId, OpId, RegionId, TypeId, ValueId,
+};
 use crate::cuda_tile_ir::ir::Operation;
 use crate::cuda_tile_ir::types::Type;
 use crate::cuda_tile_ir::value::ValueData;

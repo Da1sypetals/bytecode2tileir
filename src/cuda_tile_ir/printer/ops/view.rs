@@ -1,15 +1,15 @@
 use std::fmt;
 
-use crate::cuda_tile_ir::OpAttrKey;
 use crate::cuda_tile_ir::attrs::Attr;
 use crate::cuda_tile_ir::ids::ValueId;
 use crate::cuda_tile_ir::ir::Operation;
 use crate::cuda_tile_ir::types::{Dim, Type};
+use crate::cuda_tile_ir::OpAttrKey;
 
-use super::super::Line;
-use super::super::Printer;
 use super::super::fmt::{attrs, types};
 use super::super::indent::MlirPrinter;
+use super::super::Line;
+use super::super::Printer;
 
 fn print_unary_arrow<W: MlirPrinter + ?Sized>(
     p: &mut Printer<'_, '_, W>,

@@ -223,7 +223,11 @@ fn f8e4m3fn_to_f64(bits: u8) -> f64 {
         return f64::NAN;
     }
     let v = (1.0 + (mant as f64) / 8.0) * 2.0f64.powi(exp - 7);
-    if sign == 1 { -v } else { v }
+    if sign == 1 {
+        -v
+    } else {
+        v
+    }
 }
 
 fn f8e5m2_to_f64(bits: u8) -> f64 {
@@ -249,7 +253,11 @@ fn f8e5m2_to_f64(bits: u8) -> f64 {
         };
     }
     let v = (1.0 + (mant as f64) / 4.0) * 2.0f64.powi(exp - 15);
-    if sign == 1 { -v } else { v }
+    if sign == 1 {
+        -v
+    } else {
+        v
+    }
 }
 
 #[cfg(test)]

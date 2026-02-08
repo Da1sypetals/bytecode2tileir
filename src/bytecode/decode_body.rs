@@ -71,7 +71,9 @@ impl<'a, 'm> BodyDecoder<'a, 'm> {
         for _ in 0..num_blocks {
             blocks.push(self.decode_block(r)?);
         }
-        Ok(self.arena.new_region(crate::cuda_tile_ir::cfg::Region { blocks }))
+        Ok(self
+            .arena
+            .new_region(crate::cuda_tile_ir::cfg::Region { blocks }))
     }
 
     fn decode_block(&mut self, r: &mut dyn ByteRead<'a>) -> Result<BlockId> {
@@ -203,13 +205,9 @@ impl<'a, 'm> BodyDecoder<'a, 'm> {
     }
 
     pub fn intern_builtin_int(&mut self, width: u8) -> TypeId {
-        if let Some((idx, _)) = self
-            .arena
-            .types
-            .iter()
-            .enumerate()
-            .find(|(_, t)| matches!(t, crate::cuda_tile_ir::types::Type::Int { width: w } if *w == width))
-        {
+        if let Some((idx, _)) = self.arena.types.iter().enumerate().find(
+            |(_, t)| matches!(t, crate::cuda_tile_ir::types::Type::Int { width: w } if *w == width),
+        ) {
             return TypeId(idx as u32);
         }
         self.arena

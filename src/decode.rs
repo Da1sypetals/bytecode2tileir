@@ -24,7 +24,10 @@ pub fn parse_bytecode<'a>(data: &'a [u8]) -> Result<crate::bytecode::module::Byt
     crate::bytecode::module::BytecodeModule::parse(file)
 }
 
-pub fn decode_module<'a>(data: &'a [u8], opts: &DecodeOptions) -> Result<crate::cuda_tile_ir::cfg::Module> {
+pub fn decode_module<'a>(
+    data: &'a [u8],
+    opts: &DecodeOptions,
+) -> Result<crate::cuda_tile_ir::cfg::Module> {
     let mut bc = parse_bytecode(data)?;
 
     if !opts.attach_debug {

@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use crate::bytecode::error::{BytecodeError, Result};
-use crate::bytecode::format::{MAGIC, SECTION_END, Version};
+use crate::bytecode::format::{Version, MAGIC, SECTION_END};
 use crate::bytecode::reader::{ByteRead, Cursor};
 
 #[derive(Debug, Clone)]

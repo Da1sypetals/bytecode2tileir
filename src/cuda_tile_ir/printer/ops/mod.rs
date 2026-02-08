@@ -6,11 +6,11 @@ pub mod view;
 
 use std::fmt;
 
-use crate::cuda_tile_ir::Opcode;
 use crate::cuda_tile_ir::ids::OpId;
+use crate::cuda_tile_ir::Opcode;
 
-use super::Printer;
 use super::indent::MlirPrinter;
+use super::Printer;
 
 pub(super) fn print_op<W: MlirPrinter + ?Sized>(
     p: &mut Printer<'_, '_, W>,
