@@ -4,13 +4,8 @@ use clap::Parser;
 use std::fs;
 use std::path::PathBuf;
 
-mod bytecode;
-mod cuda_tile_ir;
-mod decode;
-mod error;
-
-use cuda_tile_ir::printer::module_to_mlir_text;
-use decode::{decode_module, DecodeOptions};
+use bytecode2mlir::cuda_tile_ir::printer::module_to_mlir_text;
+use bytecode2mlir::decode::{decode_module, DecodeOptions};
 
 #[derive(Parser)]
 #[command(name = "bytecode2mlir")]
@@ -28,7 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Check if it's a valid bytecode file
     let data = fs::read(&args.input)?;
-    if !bytecode::is_tilir_bytecode(&data) {
+    if !bytecode2mlir::bytecode::is_tilir_bytecode(&data) {
         eprintln!(
             "Error: '{}' is not a valid TileIR bytecode file",
             args.input.display()
