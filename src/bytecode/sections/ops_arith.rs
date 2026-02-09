@@ -4,7 +4,7 @@ use smallvec::SmallVec;
 
 use crate::bytecode::decode_body::BodyDecoder;
 use crate::bytecode::error::{BytecodeError, Result};
-use crate::bytecode::format::TypeId;
+use crate::bytecode::format::{TypeId, Version};
 use crate::bytecode::reader::ByteRead;
 use crate::cuda_tile_ir::attrs::Attr;
 use crate::cuda_tile_ir::debug::Location;
@@ -13,6 +13,13 @@ use crate::cuda_tile_ir::enums::{
 };
 use crate::cuda_tile_ir::ids::{OpId, RegionId};
 use crate::cuda_tile_ir::{OpAttrKey, Opcode};
+
+/// Bytecode version 13.2.0 – several opcodes gained new fields at this version.
+const V13_2: Version = Version {
+    major: 13,
+    minor: 2,
+    tag: 0,
+};
 
 macro_rules! bin_operands {
     ($d:expr, $r:expr) => {{
@@ -93,7 +100,12 @@ pub fn decode_negi<'a, 'm>(
     r: &mut dyn ByteRead<'a>,
     loc: Location,
 ) -> Result<OpId> {
-    decode_int_unary_simple(d, r, Opcode::NegI, loc)
+    // Since v13.2: NegI has an overflow attribute (same layout as AddI etc.)
+    if d.ctx.version >= V13_2 {
+        decode_int_unary_with_overflow(d, r, Opcode::NegI, loc)
+    } else {
+        decode_int_unary_simple(d, r, Opcode::NegI, loc)
+    }
 }
 
 pub fn decode_addi<'a, 'm>(
@@ -300,7 +312,12 @@ pub fn decode_tanh<'a, 'm>(
     r: &mut dyn ByteRead<'a>,
     loc: Location,
 ) -> Result<OpId> {
-    decode_float_unary_no_attrs(d, r, Opcode::TanH, loc)
+    // Since v13.2: TanH has a rounding_mode attribute
+    if d.ctx.version >= V13_2 {
+        decode_float_unary_with_rounding(d, r, Opcode::TanH, loc)
+    } else {
+        decode_float_unary_no_attrs(d, r, Opcode::TanH, loc)
+    }
 }
 
 pub fn decode_exp2<'a, 'm>(
@@ -804,6 +821,56 @@ fn decode_int_unary_simple<'a, 'm>(
         SmallVec::from_slice(&[operand]),
         std::iter::once(result_ty),
         crate::cuda_tile_ir::ir::AttrMap::new(),
+        Vec::<RegionId>::new(),
+        loc,
+    ))
+}
+
+/// Unary integer op with an overflow attribute (v13.2+).
+fn decode_int_unary_with_overflow<'a, 'm>(
+    d: &mut BodyDecoder<'a, 'm>,
+    r: &mut dyn ByteRead<'a>,
+    opcode: Opcode,
+    loc: Location,
+) -> Result<OpId> {
+    let result_ty = TypeId(read_u32_var(r)?);
+    let overflow = read_enum::<IntegerOverflow>(r, "IntegerOverflow")?;
+    let operand = d.read_value_from_stream(r)?;
+
+    let overflow_attr = d.arena.intern_attr(Attr::IntegerOverflow(overflow));
+    let mut attrs = crate::cuda_tile_ir::ir::AttrMap::new();
+    attrs.push((OpAttrKey::Overflow, overflow_attr));
+
+    Ok(d.build_op(
+        opcode,
+        SmallVec::from_slice(&[operand]),
+        std::iter::once(result_ty),
+        attrs,
+        Vec::<RegionId>::new(),
+        loc,
+    ))
+}
+
+/// Unary float op with a rounding_mode attribute (v13.2+).
+fn decode_float_unary_with_rounding<'a, 'm>(
+    d: &mut BodyDecoder<'a, 'm>,
+    r: &mut dyn ByteRead<'a>,
+    opcode: Opcode,
+    loc: Location,
+) -> Result<OpId> {
+    let result_ty = TypeId(read_u32_var(r)?);
+    let rm = read_enum::<RoundingMode>(r, "RoundingMode")?;
+    let operand = d.read_value_from_stream(r)?;
+
+    let rm_attr = d.arena.intern_attr(Attr::RoundingMode(rm));
+    let mut attrs = crate::cuda_tile_ir::ir::AttrMap::new();
+    attrs.push((OpAttrKey::RoundingMode, rm_attr));
+
+    Ok(d.build_op(
+        opcode,
+        SmallVec::from_slice(&[operand]),
+        std::iter::once(result_ty),
+        attrs,
         Vec::<RegionId>::new(),
         loc,
     ))

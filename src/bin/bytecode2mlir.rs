@@ -14,12 +14,18 @@ struct Args {
     /// Input TileIR bytecode file
     input: PathBuf,
 
-    /// Output MLIR file
-    output: PathBuf,
+    /// Output MLIR file (default: <input_stem>.mlir in the same directory)
+    output: Option<PathBuf>,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
+
+    let output = args.output.unwrap_or_else(|| {
+        let mut p = args.input.clone();
+        p.set_extension("mlir");
+        p
+    });
 
     // Check if it's a valid bytecode file
     let data = fs::read(&args.input)?;
@@ -43,8 +49,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mlir_text = module_to_mlir_text(&ir_module);
 
     // Write to output file
-    fs::write(&args.output, mlir_text)?;
-    eprintln!("Successfully wrote MLIR to: {}", args.output.display());
+    fs::write(&output, mlir_text)?;
+    eprintln!("Successfully wrote MLIR to: {}", output.display());
 
     Ok(())
 }

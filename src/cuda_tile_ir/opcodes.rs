@@ -96,6 +96,7 @@ pub enum Opcode {
     TruncI = 0x6B,
     XOrI = 0x6C,
     Yield = 0x6D,
+    Atan2 = 0x6E,
 }
 
 impl Opcode {
@@ -193,6 +194,7 @@ impl Opcode {
             0x6B => Some(Self::TruncI),
             0x6C => Some(Self::XOrI),
             0x6D => Some(Self::Yield),
+            0x6E => Some(Self::Atan2),
             _ => None,
         }
     }
@@ -291,6 +293,7 @@ impl Opcode {
             Self::TruncI => "trunci",
             Self::XOrI => "xori",
             Self::Yield => "yield",
+            Self::Atan2 => "atan2",
         }
     }
 }

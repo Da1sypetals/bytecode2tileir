@@ -4,12 +4,19 @@ use smallvec::SmallVec;
 
 use crate::bytecode::decode_body::BodyDecoder;
 use crate::bytecode::error::{BytecodeError, Result};
-use crate::bytecode::format::TypeId;
+use crate::bytecode::format::{TypeId, Version};
 use crate::bytecode::reader::ByteRead;
 use crate::cuda_tile_ir::attrs::Attr;
 use crate::cuda_tile_ir::debug::Location;
 use crate::cuda_tile_ir::ids::{OpId, RegionId, ValueId};
 use crate::cuda_tile_ir::{OpAttrKey, Opcode};
+
+/// Bytecode version 13.2.0 – several opcodes gained new fields at this version.
+const V13_2: Version = Version {
+    major: 13,
+    minor: 2,
+    tag: 0,
+};
 
 pub fn decode_for<'a, 'm>(
     d: &mut BodyDecoder<'a, 'm>,
@@ -22,11 +29,20 @@ pub fn decode_for<'a, 'm>(
         result_tys.push(TypeId(read_u32_var(r)?));
     }
 
+    // Since v13.2: read flags (bit 0 = unsignedCmp)
+    let _unsigned_cmp = if d.ctx.version >= V13_2 {
+        let flags = r.read_var_u64()?;
+        (flags & 1) != 0
+    } else {
+        false
+    };
+
     let num_operands = r.read_var_u64()? as usize;
     if num_operands < 3 {
-        return Err(BytecodeError::ParseError(
-            "for: expected at least 3 operands".into(),
-        ));
+        return Err(BytecodeError::ParseError(format!(
+            "Expected at least 3 operands, got {}",
+            num_operands
+        )));
     }
 
     let mut operands = SmallVec::<[ValueId; 4]>::with_capacity(num_operands);

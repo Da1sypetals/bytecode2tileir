@@ -5,12 +5,19 @@ use smallvec::SmallVec;
 use crate::bytecode::attrs;
 use crate::bytecode::decode_body::BodyDecoder;
 use crate::bytecode::error::Result;
-use crate::bytecode::format::{ConstId, StrId, TypeId};
+use crate::bytecode::format::{ConstId, StrId, TypeId, Version};
 use crate::bytecode::reader::ByteRead;
 use crate::cuda_tile_ir::attrs::{Attr, DenseStorage};
 use crate::cuda_tile_ir::debug::Location;
 use crate::cuda_tile_ir::ids::{OpId, RegionId, ValueId};
 use crate::cuda_tile_ir::{OpAttrKey, Opcode};
+
+/// Bytecode version 13.2.0 – several opcodes gained new fields at this version.
+const V13_2: Version = Version {
+    major: 13,
+    minor: 2,
+    tag: 0,
+};
 
 pub fn decode_constant<'a, 'm>(
     d: &mut BodyDecoder<'a, 'm>,
@@ -289,16 +296,31 @@ pub fn decode_print<'a, 'm>(
     loc: Location,
 ) -> Result<OpId> {
     let num_results = r.read_var_u64()? as usize;
+    let mut result_tys = Vec::with_capacity(num_results);
     for _ in 0..num_results {
-        let _ = r.read_var_u64()?;
+        result_tys.push(TypeId(read_u32_var(r)?));
     }
+
+    // Since v13.2: read flags (bit 0 = token present)
+    let has_token = if d.ctx.version >= V13_2 {
+        let flags = r.read_var_u64()?;
+        (flags & 1) != 0
+    } else {
+        false
+    };
 
     let format = d.ctx.strings.get(StrId(read_u32_var(r)?))?.to_string();
     let format_attr = d.arena.intern_attr(Attr::String(format));
 
     let num_args = r.read_var_u64()? as usize;
-    let mut operands = SmallVec::<[ValueId; 4]>::with_capacity(num_args);
+    let mut operands =
+        SmallVec::<[ValueId; 4]>::with_capacity(num_args + if has_token { 1 } else { 0 });
     for _ in 0..num_args {
+        operands.push(d.read_value_from_stream(r)?);
+    }
+
+    // Read optional token operand (v13.2)
+    if has_token {
         operands.push(d.read_value_from_stream(r)?);
     }
 
@@ -308,7 +330,7 @@ pub fn decode_print<'a, 'm>(
     Ok(d.build_op(
         Opcode::Print,
         operands,
-        std::iter::empty(),
+        result_tys,
         attrs,
         Vec::<RegionId>::new(),
         loc,
