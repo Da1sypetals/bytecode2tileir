@@ -3,6 +3,7 @@ use crate::interpreter::data_structures::{
     tile::Tile,
 };
 
+#[derive(Debug, Clone)]
 pub enum Value {
     /// Scalar or tensor of data
     Tile(Tile),

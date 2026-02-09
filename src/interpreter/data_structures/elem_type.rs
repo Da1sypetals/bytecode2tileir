@@ -23,3 +23,39 @@ pub enum Scalar {
     F64(f64),
     Ptr(*mut u8),
 }
+
+impl Scalar {
+    pub fn elem_type(&self) -> ElemType {
+        match self {
+            Scalar::Bool(_) => ElemType::Bool,
+            Scalar::I8(_) => ElemType::I8,
+            Scalar::I16(_) => ElemType::I16,
+            Scalar::I32(_) => ElemType::I32,
+            Scalar::I64(_) => ElemType::I64,
+            Scalar::F16(_) => ElemType::F16,
+            Scalar::F32(_) => ElemType::F32,
+            Scalar::F64(_) => ElemType::F64,
+            Scalar::Ptr(_) => ElemType::Ptr,
+        }
+    }
+
+    pub fn size_bytes(&self) -> usize {
+        self.elem_type().size_bytes()
+    }
+}
+
+impl ElemType {
+    pub fn size_bytes(&self) -> usize {
+        match self {
+            ElemType::Bool => 1,
+            ElemType::I8 => 1,
+            ElemType::I16 => 2,
+            ElemType::I32 => 4,
+            ElemType::I64 => 8,
+            ElemType::F16 => 2,
+            ElemType::F32 => 4,
+            ElemType::F64 => 8,
+            ElemType::Ptr => 8,
+        }
+    }
+}
