@@ -1,4 +1,5 @@
 //! bytecode2mlir - Convert Tile IR bytecode to MLIR text format
+#![feature(f16)]
 
 pub mod bytecode;
 pub mod cuda_tile_ir;

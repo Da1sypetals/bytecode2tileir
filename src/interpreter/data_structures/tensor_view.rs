@@ -15,6 +15,9 @@ pub struct TensorView {
     strides: Vec<i64>,
 }
 
+unsafe impl Sync for TensorView {}
+unsafe impl Send for TensorView {}
+
 #[derive(Debug, Clone)]
 pub struct PartitionView {
     /// The underlying tensor view
@@ -28,3 +31,6 @@ pub struct PartitionView {
     /// Padding value for masked loads
     padding_value: Option<Scalar>,
 }
+
+unsafe impl Sync for PartitionView {}
+unsafe impl Send for PartitionView {}

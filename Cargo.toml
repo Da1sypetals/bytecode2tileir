@@ -12,6 +12,9 @@ clap = { version = "4.5", features = ["derive"] }
 rayon = "1.11.0"
 indicatif = { version = "0.18.3", features = ["rayon"] }
 ndarray = "0.17.2"
+itertools = "0.14.0"
+# float16 = "0.1.5"
+
 
 [[bin]]
 name = "bytecode2mlir"
