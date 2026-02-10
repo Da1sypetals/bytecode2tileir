@@ -1,0 +1,8 @@
+- Ignore all code quality warning like "unused variables, unused imports, dead code" etc.
+- Write ONE test at a time. Writing too much into one file can be truncated.
+- Wait until test completes, no matter how long it takes, as long as it has no dead loops. It is NOT ACCEPTABLE to just simplify the tests because it takes too long.
+- Append into a file with tool call, NOT redirect.
+- Ignore thread safety by adding empty implementation for Send and Sync. We EXPLICITLY DO NOT care about thread safety here.
+- Make sure tile size is AT MOST tensor size / 16.
+- Run tests ONE AT A TIME time and fix them ONE AT A TIME, after each fix, STOP for my commands. 
+- Remember your goal is TO MAKE SURE THE LIBRARY IS CORRECT, NOT pass all tests, so there may be bugs in library OR tests and you should fix them.

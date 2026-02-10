@@ -11,7 +11,7 @@ pub enum ElemType {
     Ptr,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Scalar {
     Bool(bool),
     I8(i8),
@@ -22,6 +22,43 @@ pub enum Scalar {
     F32(f32),
     F64(f64),
     Ptr(*mut u8),
+}
+
+impl Eq for Scalar {}
+
+impl PartialOrd for Scalar {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        match (self, other) {
+            (Scalar::Bool(a), Scalar::Bool(b)) => a.partial_cmp(b),
+            (Scalar::I8(a), Scalar::I8(b)) => a.partial_cmp(b),
+            (Scalar::I16(a), Scalar::I16(b)) => a.partial_cmp(b),
+            (Scalar::I32(a), Scalar::I32(b)) => a.partial_cmp(b),
+            (Scalar::I64(a), Scalar::I64(b)) => a.partial_cmp(b),
+            (Scalar::F16(a), Scalar::F16(b)) => {
+                if a.is_nan() && b.is_nan() {
+                    Some(std::cmp::Ordering::Equal)
+                } else {
+                    a.partial_cmp(b)
+                }
+            }
+            (Scalar::F32(a), Scalar::F32(b)) => {
+                if a.is_nan() && b.is_nan() {
+                    Some(std::cmp::Ordering::Equal)
+                } else {
+                    a.partial_cmp(b)
+                }
+            }
+            (Scalar::F64(a), Scalar::F64(b)) => {
+                if a.is_nan() && b.is_nan() {
+                    Some(std::cmp::Ordering::Equal)
+                } else {
+                    a.partial_cmp(b)
+                }
+            }
+            (Scalar::Ptr(a), Scalar::Ptr(b)) => (*a as usize).partial_cmp(&(*b as usize)),
+            _ => None,
+        }
+    }
 }
 
 impl Scalar {
@@ -59,3 +96,8 @@ impl ElemType {
         }
     }
 }
+
+// UNSAFE: We don't care about thread safety for GPU-like operations
+// GPU execution doesn't guarantee thread safety either
+unsafe impl Send for Scalar {}
+unsafe impl Sync for Scalar {}
