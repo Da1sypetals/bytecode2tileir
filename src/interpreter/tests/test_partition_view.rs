@@ -44,6 +44,38 @@ unsafe fn fill_tensor_arange_i32(ptr: *mut u8, shape: &[i64], strides: &[i64]) {
         });
 }
 
+/// Fill tensor with arange pattern: tensor[indices] = linear_index
+unsafe fn fill_tensor_arange_f16(ptr: *mut u8, shape: &[i64], strides: &[i64]) {
+    let rank = shape.len();
+    let total_elements: usize = shape.iter().product::<i64>() as usize;
+
+    let iptr = ptr as usize;
+
+    (0..total_elements)
+        .into_par_iter()
+        .progress()
+        .for_each(|linear_idx| {
+            let mut indices = vec![0i64; rank];
+            let mut remaining = linear_idx;
+
+            // Convert linear index to multi-dimensional indices
+            for dim in (0..rank).rev() {
+                let dim_size = shape[dim] as usize;
+                indices[dim] = (remaining % dim_size) as i64;
+                remaining /= dim_size;
+            }
+
+            // Calculate byte offset using strides (strides are in element units)
+            let mut elem_offset = 0i64;
+            for dim in 0..rank {
+                elem_offset += indices[dim] * strides[dim];
+            }
+            let byte_offset = (elem_offset * 2) as usize; // f16 = 2 bytes
+
+            *((iptr as *mut u8).add(byte_offset) as *mut f16) = linear_idx as f16 * 0.05;
+        });
+}
+
 // ============================================================================
 // 2D Dimension Permutation Tests
 // ============================================================================
@@ -453,11 +485,11 @@ fn test_dim_map_4d_partial_transpose_random() {
 // ============================================================================
 
 #[test]
-fn test_partition_view_3d_irregular_tile_access_large() {
-    println!("3D irregular access: 1024x1024x512 with 32x32x32 tiles");
+fn test_partition_view_3d_random_tile_access_large() {
+    println!("3D random access: 1024x1024x512 with 32x32x32 tiles");
 
     let shape = vec![256i64, 256, 128];
-    let strides = vec![64 * 32, 512, 1];
+    let strides = vec![128 * 256, 128, 1];
     let tile_shape = vec![16i32, 16, 8];
     let buffer_size = 1024 * 64 * 32 * 4;
 
@@ -492,18 +524,18 @@ fn test_partition_view_3d_irregular_tile_access_large() {
                     let tensor_j = grid_pos[1] * 16 + j;
                     let tensor_k = grid_pos[2] * 8 + k;
 
-                    if tensor_i < shape[0] && tensor_j < shape[1] && tensor_k < shape[2] {
-                        let expected_linear = (tensor_i * shape[1] * shape[2]
-                            + tensor_j * shape[2]
-                            + tensor_k) as i32;
-                        let actual = tile.get_scalar(&[i, j, k]);
+                    assert!(tensor_i < shape[0] && tensor_j < shape[1] && tensor_k < shape[2]);
 
-                        if actual != Scalar::I32(expected_linear) {
-                            panic!(
+                    let expected_linear =
+                        (tensor_i * shape[1] * shape[2] + tensor_j * shape[2] + tensor_k) as i32;
+
+                    let actual = tile.get_scalar(&[i, j, k]);
+
+                    if actual != Scalar::I32(expected_linear) {
+                        panic!(
                                 "Iter {}: Data mismatch at grid={:?}, tile_idx=[{},{},{}], tensor_idx=[{},{},{}]: expected {}, got {:?}",
                                 iter, grid_pos, i, j, k, tensor_i, tensor_j, tensor_k, expected_linear, actual
                             );
-                        }
                     }
                 }
             }
@@ -522,22 +554,23 @@ fn test_partition_view_3d_irregular_shape_large() {
     let shape = vec![255i64, 255, 127];
     let strides = vec![255 * 127, 127, 1];
     let tile_shape = vec![16i32, 16, 8];
-    let buffer_size = 255 * 255 * 127 * 4;
+    let buffer_size = 255 * 255 * 127 * 2;
 
     let mut buffer = allocate_buffer(buffer_size);
     let ptr = buffer.as_mut_ptr();
 
     unsafe {
-        fill_tensor_arange_i32(ptr, &shape, &strides);
+        fill_tensor_arange_f16(ptr, &shape, &strides);
     }
 
-    let tensor_view = TensorView::new(ptr, ElemType::I32, shape.clone(), strides);
+    let tensor_view = TensorView::new(ptr, ElemType::F16, shape.clone(), strides);
+    let pad_val: f16 = -1.234;
     let partition = PartitionView::new(
         tensor_view,
         tile_shape.clone(),
         vec![0, 1, 2],
         true,
-        Some(Scalar::I32(0)),
+        Some(Scalar::F16(pad_val)),
     );
 
     let grid_shape = partition.index_space_shape();
@@ -572,10 +605,19 @@ fn test_partition_view_3d_irregular_shape_large() {
                     if tensor_i < shape[0] && tensor_j < shape[1] && tensor_k < shape[2] {
                         let expected_linear = (tensor_i * shape[1] * shape[2]
                             + tensor_j * shape[2]
-                            + tensor_k) as i32;
+                            + tensor_k) as f16 * 0.05;
                         let actual = tile.get_scalar(&[i, j, k]);
 
-                        if actual != Scalar::I32(expected_linear) {
+                        if actual != Scalar::F16(expected_linear) {
+                            panic!(
+                                "Iter {}: Data mismatch at grid={:?}, tile_idx=[{},{},{}], tensor_idx=[{},{},{}]: expected {}, got {:?}",
+                                iter, grid_pos, i, j, k, tensor_i, tensor_j, tensor_k, expected_linear, actual
+                            );
+                        }
+                    } else {
+                        let expected_linear = -pad_val;
+                        let actual = tile.get_scalar(&[i, j, k]);
+                        if actual != Scalar::F16(expected_linear) {
                             panic!(
                                 "Iter {}: Data mismatch at grid={:?}, tile_idx=[{},{},{}], tensor_idx=[{},{},{}]: expected {}, got {:?}",
                                 iter, grid_pos, i, j, k, tensor_i, tensor_j, tensor_k, expected_linear, actual
@@ -592,12 +634,15 @@ fn test_partition_view_3d_irregular_shape_large() {
 
 #[test]
 fn test_partition_view_3d_padding_border_definite() {
-    println!("3D padding border test: 256x256x128 with 16x16x8 tiles (padding=0)");
-
-    let shape = vec![256i64, 256, 128];
-    let strides = vec![256 * 128, 128, 1];
+    let shape = vec![256i64, 255, 129];
+    let strides = vec![255 * 129, 129, 1];
     let tile_shape = vec![16i32, 16, 8];
-    let buffer_size = 256 * 256 * 128 * 4;
+    let buffer_size = 256 * 255 * 129 * 4;
+
+    println!(
+        "3D border test: shape: {:?}, strides: {:?}, tile_shape: {:?}, buffer_size: {:?}",
+        shape, strides, tile_shape, buffer_size
+    );
 
     let mut buffer = allocate_buffer(buffer_size);
     let ptr = buffer.as_mut_ptr();
