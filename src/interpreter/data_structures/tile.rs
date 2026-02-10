@@ -1,4 +1,4 @@
-use ndarray::{Array, ArrayD, Axis, IxDyn};
+use ndarray::{Array, IxDyn};
 
 use crate::interpreter::data_structures::elem_type::{ElemType, Scalar};
 
@@ -65,5 +65,39 @@ impl Tile {
 
     pub fn is_scalar(&self) -> bool {
         self.rank() == 0
+    }
+
+    /// Get scalar value at given indices
+    pub fn get_scalar(&self, indices: &[i64]) -> Scalar {
+        let idx_usize: Vec<usize> = indices.iter().map(|&i| i as usize).collect();
+        match self {
+            Tile::I1(a) => Scalar::Bool(a[IxDyn(&idx_usize)]),
+            Tile::I8(a) => Scalar::I8(a[IxDyn(&idx_usize)]),
+            Tile::I16(a) => Scalar::I16(a[IxDyn(&idx_usize)]),
+            Tile::I32(a) => Scalar::I32(a[IxDyn(&idx_usize)]),
+            Tile::I64(a) => Scalar::I64(a[IxDyn(&idx_usize)]),
+            Tile::F16(a) => Scalar::F16(a[IxDyn(&idx_usize)]),
+            Tile::F32(a) => Scalar::F32(a[IxDyn(&idx_usize)]),
+            Tile::F64(a) => Scalar::F64(a[IxDyn(&idx_usize)]),
+            Tile::Ptr(a) => Scalar::Ptr(a[IxDyn(&idx_usize)]),
+        }
+    }
+
+    /// Set scalar value at given indices
+    pub fn set_scalar(&mut self, indices: &[i64], value: Scalar) {
+        assert_eq!(value.elem_type(), self.elem_type(), "Scalar type must match tile element type");
+        let idx_usize: Vec<usize> = indices.iter().map(|&i| i as usize).collect();
+        match (self, value) {
+            (Tile::I1(a), Scalar::Bool(v)) => a[IxDyn(&idx_usize)] = v,
+            (Tile::I8(a), Scalar::I8(v)) => a[IxDyn(&idx_usize)] = v,
+            (Tile::I16(a), Scalar::I16(v)) => a[IxDyn(&idx_usize)] = v,
+            (Tile::I32(a), Scalar::I32(v)) => a[IxDyn(&idx_usize)] = v,
+            (Tile::I64(a), Scalar::I64(v)) => a[IxDyn(&idx_usize)] = v,
+            (Tile::F16(a), Scalar::F16(v)) => a[IxDyn(&idx_usize)] = v,
+            (Tile::F32(a), Scalar::F32(v)) => a[IxDyn(&idx_usize)] = v,
+            (Tile::F64(a), Scalar::F64(v)) => a[IxDyn(&idx_usize)] = v,
+            (Tile::Ptr(a), Scalar::Ptr(v)) => a[IxDyn(&idx_usize)] = v,
+            _ => panic!("Type mismatch in set_scalar"),
+        }
     }
 }
