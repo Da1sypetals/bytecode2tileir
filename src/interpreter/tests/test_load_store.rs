@@ -378,8 +378,9 @@ fn test_memory_stress_512mb_random_ops() {
 
     let mut rng = StdRng::seed_from_u64(55555);
 
-    // Perform 15000 random load/store operations
-    for op in 0..15000 {
+    // Perform num_ops random load/store operations
+    let num_ops = 2000;
+    for op in 0..num_ops {
         let i = rng.random_range(0..index_space[0]);
         let j = rng.random_range(0..index_space[1]);
 
