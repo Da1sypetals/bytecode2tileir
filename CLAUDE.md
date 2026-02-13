@@ -11,3 +11,5 @@ Code should be written to seek fast-fail; it should crash in place at the point 
 If you are unable to fulfill my request, you should actively terminate the task and tell me "TASK CANNOT BE COMPLETED," **RATHER THAN** attempting to skip, omit, or deceive me.
 
 Use the Python from the currently active conda environment, not the system Python.
+
+If you want to write exceedingly long content into 1 file, you should use file writing tools multiple tiles to append to the same file. DO NOT create huge bash command to concatenate files.
