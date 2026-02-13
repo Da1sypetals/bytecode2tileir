@@ -2,6 +2,8 @@ use crate::interpreter::data_structures::{
     elem_type::{ElemType, Scalar},
     tensor_view::{PartitionView, TensorView},
 };
+use indicatif::ParallelProgressIterator;
+use itertools::Itertools;
 use rand::{rngs::StdRng, seq::SliceRandom, RngExt, SeedableRng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
@@ -56,24 +58,29 @@ impl TestTensor {
         let elem_size = self.elem_type.size_bytes();
         let elem_type = self.elem_type;
 
-        (0..total_elements).into_par_iter().for_each(|linear_idx| {
-            let indices = linear_to_nd_index(linear_idx, &shape);
-            let elem_offset: i64 = indices
-                .iter()
-                .zip(&strides)
-                .map(|(&idx, &st)| idx * st)
-                .sum();
-            let byte_offset = (elem_offset as usize) * elem_size;
+        (0..total_elements)
+            .into_par_iter()
+            .progress()
+            .for_each(|linear_idx| {
+                let indices = linear_to_nd_index(linear_idx, &shape);
 
-            unsafe {
-                let p = (ptr + byte_offset) as *mut u8;
-                match elem_type {
-                    ElemType::I32 => *(p as *mut i32) = linear_idx as i32,
-                    ElemType::I64 => *(p as *mut i64) = linear_idx as i64,
-                    _ => panic!("fill_arange only supports I32 and I64"),
+                // Element offset is the dot product of indices and strides
+                let elem_offset: i64 = indices
+                    .iter()
+                    .zip(&strides)
+                    .map(|(&idx, &st)| idx * st)
+                    .sum();
+                let byte_offset = (elem_offset as usize) * elem_size;
+
+                unsafe {
+                    let p = (ptr + byte_offset) as *mut u8;
+                    match elem_type {
+                        ElemType::I32 => *(p as *mut i32) = linear_idx as i32,
+                        ElemType::I64 => *(p as *mut i64) = linear_idx as i64,
+                        _ => panic!("fill_arange only supports I32 and I64"),
+                    }
                 }
-            }
-        });
+            });
     }
 
     /// Fill with arange pattern scaled: tensor[indices] = linear_index * scale
@@ -1543,7 +1550,7 @@ fn test_partition_view_5d_padding_corners_definite() {
     println!("5D padding corners: 64x65x32x17x9 with 4x4x2x1x1 tiles");
 
     let shape = vec![64i64, 65, 32, 17, 9];
-    let tile_shape = vec![4i32, 4, 2, 1, 1];
+    let tile_shape = vec![8, 8, 2, 4, 4];
 
     let mut tensor = TestTensor::new(shape.clone(), ElemType::I32);
     tensor.fill_arange();
@@ -1600,24 +1607,21 @@ fn test_partition_view_5d_padding_corners_definite() {
     positions.par_iter().for_each(|grid_pos| {
         let tile = partition.load_tile(grid_pos);
 
-        for i in 0..4i64 {
-            for j in 0..4i64 {
-                for k in 0..2i64 {
-                    for l in 0..1i64 {
-                        for m in 0..1i64 {
-                            let tensor_idx =
-                                grid_to_tensor_index(grid_pos, &tile_shape, &[i, j, k, l, m], None);
-                            let actual = tile.get_scalar(&[i, j, k, l, m]);
+        for (i, j, k, l, m) in (0..tile_shape[0])
+            .cartesian_product(0..tile_shape[1])
+            .cartesian_product(0..tile_shape[2])
+            .cartesian_product(0..tile_shape[3])
+            .cartesian_product(0..tile_shape[4])
+            .map(|((((i, j), k), l), m)| (i as i64, j as i64, k as i64, l as i64, m as i64))
+        {
+            let tensor_idx = grid_to_tensor_index(grid_pos, &tile_shape, &[i, j, k, l, m], None);
+            let actual = tile.get_scalar(&[i, j, k, l, m]);
 
-                            if tensor.in_bounds(&tensor_idx) {
-                                let expected = tensor.get(&tensor_idx);
-                                assert_eq!(actual, expected);
-                            } else {
-                                assert_eq!(actual, Scalar::I32(-12345));
-                            }
-                        }
-                    }
-                }
+            if tensor.in_bounds(&tensor_idx) {
+                let expected = tensor.get(&tensor_idx);
+                assert_eq!(actual, expected);
+            } else {
+                assert_eq!(actual, Scalar::I32(-12345));
             }
         }
     });
