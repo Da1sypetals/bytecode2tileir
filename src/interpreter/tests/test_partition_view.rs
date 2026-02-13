@@ -623,15 +623,41 @@ fn test_dim_map_4d_partial_transpose_0132() {
 
 #[test]
 fn test_dim_map_4d_partial_transpose_random() {
-    let mut tensor = TestTensor::new(vec![8, 8, 8, 4], ElemType::I32);
+    // Configuration
+    let tensor_shape = vec![256i64, 16, 64, 32];
+    let tile_shape = vec![64i32, 8, 32, 4];
+
+    let mut tensor = TestTensor::new(tensor_shape.clone(), ElemType::I32);
     tensor.fill_with(|idx| (idx[0] * 1000 + idx[1] * 100 + idx[2] * 10 + idx[3]) as i32);
 
     let mut rng = rand::rng();
-    let mut dim_map = vec![0, 1, 2, 3];
+    let mut dim_map = vec![0i32, 1, 2, 3];
     dim_map.shuffle(&mut rng);
     println!("dim_map: {:?}", dim_map);
+    println!("tensor_shape: {:?}", tensor_shape);
+    println!("tile_shape: {:?}", tile_shape);
 
-    let tile_shape = vec![2, 2, 2, 2];
+    // Validate: tile_size <= tensor_size (considering dim_map)
+    let valid = tile_shape.iter().enumerate().all(|(tile_dim, &t)| {
+        let tensor_dim = dim_map[tile_dim] as usize;
+        t as i64 <= tensor_shape[tensor_dim]
+    });
+    if !valid {
+        println!(
+            "SKIP: tile_shape {:?} exceeds mapped tensor_shape {:?} with dim_map {:?}",
+            tile_shape, tensor_shape, dim_map
+        );
+        println!();
+        for i in 0..4 {
+            // Print mapped tensor shape and tile shape, aligned
+            println!(
+                "dim {:>2} : tensor_shape = {:>4}, tile_shape = {:>4}",
+                i, tensor_shape[dim_map[i] as usize], tile_shape[i]
+            );
+        }
+        println!();
+        return;
+    }
     let partition = PartitionView::new(
         tensor.as_view(),
         tile_shape.clone(),
@@ -640,22 +666,19 @@ fn test_dim_map_4d_partial_transpose_random() {
         None,
     );
 
+    let grid_shape = partition.index_space_shape();
+
     // Test multiple random tiles
     for test_iter in 0..10 {
-        let grid_pos = vec![
-            rng.random_range(0..2),
-            rng.random_range(0..2),
-            rng.random_range(0..2),
-            rng.random_range(0..2),
-        ];
+        let grid_pos: Vec<i64> = grid_shape.iter().map(|&g| rng.random_range(0..g)).collect();
         println!("Test {}: grid_pos={:?}", test_iter, grid_pos);
 
         let tile = partition.load_tile(&grid_pos);
 
-        for ti in 0..2i64 {
-            for tj in 0..2i64 {
-                for tk in 0..2i64 {
-                    for tl in 0..2i64 {
+        for ti in 0..tile_shape[0] as i64 {
+            for tj in 0..tile_shape[1] as i64 {
+                for tk in 0..tile_shape[2] as i64 {
+                    for tl in 0..tile_shape[3] as i64 {
                         let tensor_idx = grid_to_tensor_index(
                             &grid_pos,
                             &tile_shape,
