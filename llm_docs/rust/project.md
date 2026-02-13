@@ -1,0 +1,8 @@
+- Ignore ALL code quality warning like "unused variables, unused imports, dead code" etc.
+- Work around Rust thread safety checks with workarounds or use empty implementation for Send and Sync, we do not care about thread safety now. We want to optimize speed. 
+- We have 2 ways to deal with errors: propagate Result::Err, or panic. This has to do with internal correctness.
+  - If the internal state is wrong, e.g. some invariants are violated, the internal state of the system is wrong (e.g. SSA values are assigned more than once or are referenced before assigned), then it is an internal state error. PANIC.
+  - If the internal state is correct but the user input is wrong, propagate error.
+- Visibility notation (pub, pub(crate)) is not a hard limit. You may modify them at your will. We are not organizing the project very rigorously to follow best practices in this aspect.
+- ALL Tests must NOT use trivial cases. You must start with real world use cases. 
+- Remember your goal is TO MAKE SURE THE LIBRARY IS CORRECT, NOT pass all tests, so there may be bugs in library OR tests and you should fix them.
