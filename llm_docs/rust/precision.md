@@ -1,0 +1,2 @@
+- For fma(a, b, c), we require a and b in same data type. first apply multiplication in a/b type, then cast the multiplication result to c's data type, and perform addition in c's data type.
+- For mma(a, b, c), it is largely similar. First apply matrix multiplication in a/b type, then cast the result to c's data type, and perform addition in c's data type.

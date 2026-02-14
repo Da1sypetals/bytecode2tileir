@@ -5,5 +5,7 @@ Tests must follow the following guidelines:
 - For flash attention, tiling is as such:
     - Q (Query) is split into blocks of size Br (typically 128 or 64)
     - K and V (Key/Value) are split into blocks of size Bc (typically 128 or 64)
-
+- In this case, tests for matmul should contain:
+    - test 1: m, n, k = 1024, 512, 256
+    - test 2: m, n, k = 1019, 523, 261
 
