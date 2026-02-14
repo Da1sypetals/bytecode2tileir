@@ -1,2 +1,4 @@
+- ALL unary and binary operations must be executed in INPUT data type (precision). Binary operations REQUIRE lhs and rhs to be in the same data type.
+- If an operation is not supported in INPUT data type, PANIC.
 - For fma(a, b, c), we require a and b in same data type. first apply multiplication in a/b type, then cast the multiplication result to c's data type, and perform addition in c's data type.
 - For mma(a, b, c), it is largely similar. First apply matrix multiplication in a/b type, then cast the result to c's data type, and perform addition in c's data type.
