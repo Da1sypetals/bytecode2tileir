@@ -22,3 +22,9 @@ You are STRICTLY PROHIBITED from creating markdown files IN ANY FORM (tool call,
 Remember to also read EVERYTHING under llm/docs_rust.
 
 You are STRICTLY PROHIBITED to make ANY kind of simplification or suggest me to simplify something, or use mocks in any kind.
+
+DO NOT DARE TO TRY TO REMOVE ANY TEST TO "PASS" THEM YOU IDIOT. YOU WILL BE FUCKED IF YOU DO THIS IDIOTIC ACT.
+
+When implementing interpreter, you MUST NOT modify any file under src/cuda_tile_ir.
+
+When reading docs, DO NOT filter or search (sed, grep, etc.), READ COMPLETE FILE.
