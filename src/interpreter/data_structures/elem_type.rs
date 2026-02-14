@@ -12,6 +12,10 @@ pub enum ElemType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Just a helper.
+/// DO NOT use in interpreter code unless you have good reasons to.
+/// Use 0-dim Tile instead. Everything in Tile IR model is a Tile,
+/// and scalar CANNOT be used interchangeably with 0-dim Tile.
 pub enum Scalar {
     Bool(bool),
     I8(i8),

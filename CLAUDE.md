@@ -15,3 +15,5 @@ Use the Python from the currently active conda environment, not the system Pytho
 If you want to write exceedingly long content into 1 file, you should use file writing tools multiple tiles to append to the same file. DO NOT create huge bash command to concatenate files.
 
 You are STRICTLY PROHIBITED from creating markdown files IN ANY FORM (tool call, heredoc, etc.) unless explicitly specified, either it is summary, specification, notes, etc. 
+
+Remember to also read EVERYTHING under llm/docs_rust.

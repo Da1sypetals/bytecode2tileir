@@ -1,4 +1,5 @@
 Tests must follow the following guidelines:
+- On GPU, Tensors lives in global memory, while Tiles live in shared memory. When I mention irregular shapes, I mean that the tensor size cannot be evenly divided by corresponding tile size. Tile size are ALWAYS regular, in fact they should be power-of-2.
 - This test is for deep learning use. All tests inputs must use realistic workload shapes, e.g. Sequence length be 4096, matrix dimenision >= 1024 and should be different for M, N, K, embed dim = 64/96/128 etc.
 - Tile size must be typical type sizes on GPU, be power of 2 and range from 8 to 64.
 - For matrix multiplication, Tensor size must be at least 8 times corresponding tile size, and at least 256. Also you should include tests for irregular shapes, which means tensor size cannot be evenly divided by corresponding tile size (use odd numbers). Using exceedingly small tensor sizes will be harshly punished.
