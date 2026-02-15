@@ -36,6 +36,10 @@ impl crate::interpreter::data_structures::interpreter::ExecutionContext<'_> {
             Opcode::PtrToPtr => self.execute_ptr_to_ptr(op),
             Opcode::TruncI => self.execute_trunci(op),
 
+            // Memory operations from llm_docs/tileir/memory.md (8.6)
+            Opcode::LoadPtrTko => self.execute_load_ptr_tko(op),
+            Opcode::StorePtrTko => self.execute_store_ptr_tko(op),
+
             _ => panic!("Opcode {:?} not implemented", op.opcode),
         }
     }
