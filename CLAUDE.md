@@ -4,7 +4,7 @@ UNLESS I EXPLICITLY REQUEST IT, **PROHIBITED** to create or modify any document.
 
 If you wish to write into a file, use **tool call**. IT IS STRICTLY PROHIBITED to write into files with heredocs (e.g. `cat ... > file.py`).
 
-When provided a web link, you must first understand the **COMPLETE** content of the linked page before beginning the task. If you discover incorrect library usage, you should **RE-VIEW** the **COMPLETE** content of the provided web link, **RATHER THAN** consulting the library's source code. If you wish to view the library's source code, you must seek approval.
+When provided a web link or documentation, you must first understand the **COMPLETE** content of the linked page before beginning the task. If you discover incorrect library usage, you should **RE-VIEW** the **COMPLETE** content of the provided web link, **RATHER THAN** consulting the library's source code. If you wish to view the library's source code, you must seek approval.
 
 Python specific: Unless explicitly requested, the use of try-except is **PROHIBITED**. To reiterate: unless explicitly requested, the use of try-except is **PROHIBITED**.
 
