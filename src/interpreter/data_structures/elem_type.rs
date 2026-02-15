@@ -99,6 +99,10 @@ impl ElemType {
             ElemType::Ptr => 8,
         }
     }
+
+    pub fn bit_width(&self) -> usize {
+        self.size_bytes() * 8
+    }
 }
 
 // UNSAFE: We don't care about thread safety for GPU-like operations

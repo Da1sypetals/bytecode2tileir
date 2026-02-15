@@ -86,6 +86,7 @@ dependencies = [
  "indicatif",
  "itertools",
  "ndarray",
+ "ndrange",
  "rand",
  "rayon",
  "smallvec",
@@ -396,6 +397,12 @@ dependencies = [
  "portable-atomic-util",
  "rawpointer",
 ]
+
+[[package]]
+name = "ndrange"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c8693ea6fdcade591dfceb1f914d870dc825c667abace22f08d3d977887f0788"
 
 [[package]]
 name = "num-complex"

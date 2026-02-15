@@ -110,4 +110,14 @@ impl Interpreter {
     pub fn create_context(&self, tile_block_id: (u32, u32, u32)) -> ExecutionContext<'_> {
         ExecutionContext::new(&self.arena, tile_block_id, self.grid_size, &self.globals)
     }
+
+    /// Get a reference to the IR arena.
+    pub fn arena(&self) -> &IrArena {
+        &self.arena
+    }
+
+    /// Get a mutable reference to the IR arena.
+    pub fn arena_mut(&mut self) -> &mut IrArena {
+        &mut self.arena
+    }
 }
