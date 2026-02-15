@@ -9,7 +9,7 @@ impl crate::interpreter::data_structures::interpreter::ExecutionContext<'_> {
         let op = self.arena.op_(op_id);
 
         match op.opcode {
-            // Core operations from llm_docs/tileir/core.md
+            // Core operations from llm_docs/tileir/core.md (8.3)
             Opcode::Broadcast => self.execute_broadcast(op),
             Opcode::Cat => self.execute_cat(op),
             Opcode::Constant => self.execute_constant(op),
@@ -24,6 +24,17 @@ impl crate::interpreter::data_structures::interpreter::ExecutionContext<'_> {
             Opcode::Reshape => self.execute_reshape(op),
             Opcode::Scan => self.execute_scan(op),
             Opcode::Select => self.execute_select(op),
+
+            // Conversion operations from llm_docs/tileir/conversions.md (8.4)
+            Opcode::Bitcast => self.execute_bitcast(op),
+            Opcode::ExtI => self.execute_exti(op),
+            Opcode::FToF => self.execute_ftof(op),
+            Opcode::FToI => self.execute_ftoi(op),
+            Opcode::IntToPtr => self.execute_int_to_ptr(op),
+            Opcode::IToF => self.execute_itof(op),
+            Opcode::PtrToInt => self.execute_ptr_to_int(op),
+            Opcode::PtrToPtr => self.execute_ptr_to_ptr(op),
+            Opcode::TruncI => self.execute_trunci(op),
 
             _ => panic!("Opcode {:?} not implemented", op.opcode),
         }
