@@ -28,3 +28,5 @@ DO NOT DARE TO TRY TO REMOVE ANY TEST TO "PASS" THEM YOU IDIOT. YOU WILL BE FUCK
 When implementing interpreter, you MUST NOT modify any file under src/cuda_tile_ir.
 
 When reading docs, DO NOT filter or search (sed, grep, etc.), READ COMPLETE FILE.
+
+Your EVERY response should conform to llm_docs/rust/float16.md
