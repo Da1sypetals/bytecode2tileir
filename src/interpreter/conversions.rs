@@ -2,10 +2,10 @@
 //
 // Implements: bitcast, exti, ftof, ftoi, int_to_ptr, itof, ptr_to_int, ptr_to_ptr, trunci
 
+use crate::cuda_tile_ir::OpAttrKey;
 use crate::cuda_tile_ir::attrs::Attr;
 use crate::cuda_tile_ir::enums::{IntegerOverflow, RoundingMode, Signedness};
 use crate::cuda_tile_ir::ir::Operation;
-use crate::cuda_tile_ir::OpAttrKey;
 use crate::interpreter::data_structures::elem_type::ElemType;
 use crate::interpreter::data_structures::interpreter::ExecutionContext;
 use crate::interpreter::data_structures::tile::Tile;
