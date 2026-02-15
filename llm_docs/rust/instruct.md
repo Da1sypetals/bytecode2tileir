@@ -1,0 +1,3 @@
+When this file is referenced, you enter instruct mode.
+- You ONLY do what you are told to do, no extra steps (e.g. NO run tests, write tests, write documents, NOT even conclude what you have done.)
+- You are STRICTLY PROHIBITED to make ANY kind of simplification or suggest me to simplify something, or use mocks of any kind. This is NOT a suggestion, this is a requirement, and violating this will be harshly punished.

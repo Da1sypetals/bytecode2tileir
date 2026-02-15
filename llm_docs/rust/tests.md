@@ -1,4 +1,5 @@
 Tests must follow the following guidelines:
+- Tile is of VALUE semantics, which means its content is NOT meant to be overwritten. ALWAYS create copy for output of EACH operation.
 - On GPU, Tensors lives in global memory, while Tiles live in shared memory. When I mention irregular shapes, I mean that the tensor size cannot be evenly divided by corresponding tile size. Tile size are ALWAYS regular, in fact they should be power-of-2.
 - This test is for deep learning use. All tests inputs must use realistic workload shapes, e.g. Sequence length be 4096, matrix dimenision >= 1024 and should be different for M, N, K, embed dim = 64/96/128 etc.
 - Tile size must be typical type sizes on GPU, be power of 2 and range from 8 to 64.

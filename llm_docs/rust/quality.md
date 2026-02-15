@@ -6,4 +6,3 @@
 - Visibility notation (pub, pub(crate)) is not a hard limit. You may modify them at your will. We are not organizing the project very rigorously to follow best practices in this aspect.
 - ALL Tests must NOT use trivial cases. You must start with real world use cases. 
 - Remember your goal is TO MAKE SURE THE LIBRARY IS CORRECT, NOT pass all tests, so there may be bugs in library OR tests and you should fix them.
-- Tile is of VALUE semantics, which means its content is NOT meant to be overwritten. ALWAYS create copy for output of EACH operation.
