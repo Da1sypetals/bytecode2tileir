@@ -30,3 +30,5 @@ When implementing interpreter, you MUST NOT modify any file under src/cuda_tile_
 When reading docs, DO NOT filter or search (sed, grep, etc.), READ COMPLETE FILE.
 
 Your EVERY response should conform to llm_docs/rust/float16.md
+
+We EXPLICITLY do not mind (or even encourage if unsafe does the job better) using unsafe, and you should NOT prioritize using safe code just because it is safe.
