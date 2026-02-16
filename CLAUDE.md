@@ -1,3 +1,14 @@
+## Obligatory Readings
+
+llm_docs/libs/iterate.md
+llm_docs/rust/float16.md
+llm_docs/rust/quality.md
+llm_docs/tileir/general.md
+llm_docs/tileir/types.md
+
+
+## Rules
+
 UNLESS I EXPLICITLY REQUEST IT, **PROHIBITED** to create or modify any document. This includes creation via command line or through a tool call; both are **PROHIBITED**.
 
 **STRICTLY PROHIBITED** to embed excessively long code (Python, Rust, etc.) within bash commands. Specifically, if the Python code will exceed 8 lines, you must first write it to a temporary file (created via a tool call in the current directory, not in the terminal) and then execute that file.
@@ -36,3 +47,5 @@ Your EVERY response should conform to llm_docs/rust/float16.md
 We EXPLICITLY do not mind (or even encourage if unsafe does the job better) using unsafe, and you should NOT prioritize using safe code just because it is safe.
 
 The typical style is implement tile associated method in float.rs, and call those methods in execute_xxx methods. Do not put heavy logic or computation in execute_xxx methods. You should refer to existing implementations for this.
+
+It is PROHIBITED to first create a `Vec` then construct `ndarray` Array with it. Instead you should create `ndarray` Array in the first place and update arrays with indexing.
