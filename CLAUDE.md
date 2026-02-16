@@ -6,6 +6,8 @@ If you wish to write into a file, use **tool call**. IT IS STRICTLY PROHIBITED t
 
 When provided a web link or documentation, you must first understand the **COMPLETE** content of the linked page before beginning the task. If you discover incorrect library usage, you should **RE-VIEW** the **COMPLETE** content of the provided web link, **RATHER THAN** consulting the library's source code. If you wish to view the library's source code, you must seek approval.
 
+When provided a web link, DO NOT think "document may exist in local" and try to find it. Your ONLY option is to fetch and read the **COMPLETE** content of the provided web link.
+
 Python specific: Unless explicitly requested, the use of try-except is **PROHIBITED**. To reiterate: unless explicitly requested, the use of try-except is **PROHIBITED**.
 
 Code should be written to seek fast-fail; it should crash in place at the point of error, **RATHER THAN** catching errors.
@@ -32,3 +34,5 @@ When reading docs, DO NOT filter or search (sed, grep, etc.), READ COMPLETE FILE
 Your EVERY response should conform to llm_docs/rust/float16.md
 
 We EXPLICITLY do not mind (or even encourage if unsafe does the job better) using unsafe, and you should NOT prioritize using safe code just because it is safe.
+
+The typical style is implement tile associated method in float.rs, and call those methods in execute_xxx methods. Do not put heavy logic or computation in execute_xxx methods. You should refer to existing implementations for this.
