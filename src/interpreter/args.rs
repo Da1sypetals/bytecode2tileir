@@ -1,10 +1,29 @@
 use crate::interpreter::data_structures::{tile::Tile, value::Value};
 use ndarray::{Array, IxDyn};
 
-pub struct KernelArgIterator {
-    
+pub type KernelArgv = Vec<Value>;
+
+/// To workaround orphan rule
+pub trait KernelGenericArgv {
+    fn and<T: KernelArg>(self, arg: T) -> Self;
+    fn push<T: KernelArg>(&mut self, arg: T);
 }
 
+/// To workaround orphan rule
+impl KernelGenericArgv for Vec<Value> {
+    fn and<T: KernelArg>(self, arg: T) -> Self {
+        let mut new = self;
+        new.push(arg.to_value());
+        new
+    }
+
+    /// ROFL: we workaround lack of function overloading in Rust
+    fn push<T: KernelArg>(&mut self, arg: T) {
+        self.push(arg.to_value());
+    }
+}
+
+// Definition of single Kernel Argument
 pub trait KernelArg {
     fn to_value(self) -> Value;
 }

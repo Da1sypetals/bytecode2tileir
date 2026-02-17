@@ -246,7 +246,7 @@ impl ExecutionContext<'_> {
     }
 
     pub fn execute_get_num_tile_blocks(&mut self, op: &Operation) {
-        let (gx, gy, gz) = self.grid_size;
+        let [gx, gy, gz] = self.grid_size;
 
         let x_tile = Tile::I32(ndarray::Array::from_elem(ndarray::IxDyn(&[]), gx as i32));
         let y_tile = Tile::I32(ndarray::Array::from_elem(ndarray::IxDyn(&[]), gy as i32));
@@ -258,7 +258,7 @@ impl ExecutionContext<'_> {
     }
 
     pub fn execute_get_tile_block_id(&mut self, op: &Operation) {
-        let (bx, by, bz) = self.tile_block_id;
+        let [bx, by, bz] = self.tile_block_id;
 
         let x_tile = Tile::I32(ndarray::Array::from_elem(ndarray::IxDyn(&[]), bx as i32));
         let y_tile = Tile::I32(ndarray::Array::from_elem(ndarray::IxDyn(&[]), by as i32));

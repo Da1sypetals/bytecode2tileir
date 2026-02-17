@@ -1,8 +1,7 @@
-use std::collections::HashMap;
-
 use crate::cuda_tile_ir::arena::IrArena;
 use crate::cuda_tile_ir::ids::ValueId;
 use crate::interpreter::data_structures::value::Value;
+use std::collections::HashMap;
 
 /// Execution context for a single tile block.
 pub struct ExecutionContext<'a> {
@@ -13,10 +12,10 @@ pub struct ExecutionContext<'a> {
     values: HashMap<u32, Value>,
 
     /// Current tile block coordinates (x, y, z).
-    pub tile_block_id: (u32, u32, u32),
+    pub tile_block_id: [u32; 3],
 
     /// Total grid dimensions (x, y, z).
-    pub grid_size: (u32, u32, u32),
+    pub grid_size: [u32; 3],
 
     /// Global memory buffers, keyed by global variable name.
     pub globals: &'a HashMap<String, Value>,
@@ -28,8 +27,8 @@ unsafe impl Send for ExecutionContext<'_> {}
 impl<'a> ExecutionContext<'a> {
     pub fn new(
         arena: &'a IrArena,
-        tile_block_id: (u32, u32, u32),
-        grid_size: (u32, u32, u32),
+        tile_block_id: [u32; 3],
+        grid_size: [u32; 3],
         globals: &'a HashMap<String, Value>,
     ) -> Self {
         ExecutionContext {
@@ -65,31 +64,22 @@ impl<'a> ExecutionContext<'a> {
     pub fn clear(&mut self) {
         self.values.clear();
     }
-
-    /// Update the tile block ID for a new execution.
-    pub fn set_tile_block_id(&mut self, id: (u32, u32, u32)) {
-        self.tile_block_id = id;
-    }
 }
 
 /// Top-level interpreter that manages kernel execution across all tile blocks.
 pub struct Interpreter {
     /// The IR arena containing all parsed IR structures.
-    arena: IrArena,
-
-    /// Grid size
-    grid_size: (u32, u32, u32),
+    pub(crate) arena: IrArena,
 
     /// Global memory buffers, keyed by global variable name.
-    globals: HashMap<String, Value>,
+    pub(crate) globals: HashMap<String, Value>,
 }
 
 impl Interpreter {
     /// Create a new interpreter with the given IR arena.
-    pub fn new(arena: IrArena, grid_size: (u32, u32, u32)) -> Self {
+    pub fn new(arena: IrArena) -> Self {
         Interpreter {
             arena,
-            grid_size,
             globals: HashMap::new(),
         }
     }
@@ -104,11 +94,6 @@ impl Interpreter {
         self.globals
             .get(name)
             .unwrap_or_else(|| panic!("Global variable {} not found", name))
-    }
-
-    /// Create an execution context for a specific tile block.
-    pub fn create_context(&self, tile_block_id: (u32, u32, u32)) -> ExecutionContext<'_> {
-        ExecutionContext::new(&self.arena, tile_block_id, self.grid_size, &self.globals)
     }
 
     /// Get a reference to the IR arena.

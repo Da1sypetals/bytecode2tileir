@@ -37,6 +37,9 @@ impl ExecutionContext<'_> {
             Opcode::TruncI => self.execute_trunci(op),
 
             // Memory operations from llm_docs/tileir/memory.md (8.6)
+            Opcode::MakeToken | Opcode::JoinTokens => {
+                println!("Omitted: {:?} @ {:?}", op.opcode, op.loc)
+            }
             Opcode::LoadPtrTko => self.execute_load_ptr_tko(op),
             Opcode::StorePtrTko => self.execute_store_ptr_tko(op),
 
@@ -89,6 +92,9 @@ impl ExecutionContext<'_> {
             Opcode::AndI => self.execute_andi(op),
             Opcode::OrI => self.execute_ori(op),
             Opcode::XOrI => self.execute_xori(op),
+
+            // Miscellaneous operations from llm_docs/tileir/misc.md (8.10)
+            Opcode::Assume => println!("Omitted: {:?} @ {:?}", op.opcode, op.loc),
 
             _ => panic!("Opcode {:?} not implemented", op.opcode),
         }
