@@ -1,0 +1,305 @@
+<section id="atomics">
+<span id="op-group-atomics"></span><h2><span class="section-number">8.10. </span>Atomics<a class="headerlink" href="#atomics" title="Link to this heading">#</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Atomic operations are limited in <strong>Tile IR</strong> as of early-access and will be updated in coming
+releases in accordance with the incoming memory model and memory operation updates.</p>
+</div>
+<section id="cuda-tile-atomic-cas-tko">
+<span id="op-cuda-tile-atomic-cas-tko"></span><h3><span class="section-number">8.10.1. </span>cuda_tile.atomic_cas_tko<a class="headerlink" href="#cuda-tile-atomic-cas-tko" title="Link to this heading">#</a></h3>
+<p><em>Atomic compare-and-swap on global memory</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre id="codecell129" tabindex="-1"><span></span><span class="n">cuda_tile</span><span class="o">.</span><span class="n">atomic_cas_tko</span> <span class="o">%</span><span class="n">memory_ordering_semantics</span> <span class="o">%</span><span class="n">memory_scope</span> <span class="o">%</span><span class="n">pointers</span> <span class="o">%</span><span class="n">cmp</span> <span class="o">%</span><span class="n">val</span> <span class="o">%</span><span class="n">mask</span> <span class="o">%</span><span class="n">token</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell129">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<section id="id363">
+<h4>Parameters<a class="headerlink" href="#id363" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>memory_ordering_semantics</strong> (<a class="tile-ir-type notranslate reference internal" href="#op-attribute-cuda-tile-atomic-cas-tko-memoryorderingsemantics-attr"><span class="std std-ref">MemoryOrderingSemantics</span></a>) - The memory ordering semantics for the atomic operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>memory_scope</strong> (<a class="tile-ir-type notranslate reference internal" href="#op-attribute-cuda-tile-atomic-cas-tko-memoryscope-attr"><span class="std std-ref">MemoryScope</span></a>) - The memory scope for the atomic operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>pointers</strong> (<a class="tile-ir-type notranslate reference internal" href="types.html#type-ptr"><span class="std std-ref">ptr</span></a>) - The pointers to the memory locations to perform the atomic compare-and-swap operation on. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>cmp</strong> (<a class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span class="std std-ref">tile</span></a>) - The values to compare against. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>val</strong> (<a class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span class="std std-ref">tile</span></a>) - The values to swap in. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>mask</strong> (<a class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span class="std std-ref">tile</span></a><span>&lt;</span><a class="tile-ir-type notranslate reference internal" href="types.html#subsection-element-types"><span class="std std-ref">i1</span></a><span class="tile-ir-type notranslate">&gt;</span>) - The mask for the atomic operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>token</strong> (<a class="tile-ir-type notranslate reference internal" href="#type-token"><span class="std std-ref">token</span></a>) - The token for the atomic operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+</ul>
+</section>
+<section id="id364">
+<h4>Results<a class="headerlink" href="#id364" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>result</strong> (<a class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span class="std std-ref">tile</span></a>) - The result of the atomic operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>result_token</strong> (<a class="tile-ir-type notranslate reference internal" href="#type-token"><span class="std std-ref">token</span></a>) - The result token of the atomic operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+</ul>
+</section>
+<section id="id365">
+<h4>Description<a class="headerlink" href="#id365" title="Link to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">atomic_cas</span></code> operation performs element-wise, atomic
+compare-and-swaps at the specified global memory <code class="code docutils literal notranslate"><span class="pre">pointers</span></code>. The data in
+memory is compared to <code class="code docutils literal notranslate"><span class="pre">cmp</span></code> and the data written to memory is specified
+by <code class="code docutils literal notranslate"><span class="pre">val</span></code>. The operation returns the original value that was stored in memory
+before the atomic operation was performed.</p>
+<p>The shape (and the element type) of <code class="code docutils literal notranslate"><span class="pre">pointers</span></code>, <code class="code docutils literal notranslate"><span class="pre">cmp</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">val</span></code> and <code class="code docutils literal notranslate"><span class="pre">result</span></code> must match. The <code class="code docutils literal notranslate"><span class="pre">atomic_cas</span></code> operation
+performs the following steps for every <code class="code docutils literal notranslate"><span class="pre">(pointer,</span> <span class="pre">cmp,</span> <span class="pre">val)</span></code> tuple in one atomic
+transaction. (One atomic transaction per tuple.)</p>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell130" tabindex="-1"><span></span><span class="w">  </span><span class="n">atomic</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">pointer</span>
+<span class="w">    </span><span class="n">if</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="o">*</span><span class="n">pointer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">val</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">return</span><span class="w"> </span><span class="n">x</span>
+<span class="p">}</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell130">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>An optional parameter, <code class="code docutils literal notranslate"><span class="pre">mask</span></code>, allows specifying which elements participate
+in the atomic operation. A false value at position i masks out the
+corresponding element in <code class="code docutils literal notranslate"><span class="pre">pointers</span></code>, excluding it from the operation. The
+returned value for a masked element at position i is <code class="code docutils literal notranslate"><span class="pre">cmp[i]</span></code>. If no mask is
+provided, all elements are included in the computation by default. The shape of
+mask must match that of pointers, cmp, and val.</p>
+<p>A token-ordered atomic compare-and-swap is not constrained by program order. The compiler
+may reorder it (i.e. place them earlier or later in program order) unless
+constrained by tokens.</p>
+<dl class="simple">
+<dt>Supported data types:</dt><dd><ul class="simple">
+<li><p>i32, i64: integer values</p></li>
+<li><p>f32, f64: floating-point values</p></li>
+</ul>
+</dd>
+</dl>
+<p>For floating-point types, the comparison uses bitwise equality rather than
+IEEE-754 semantics. This means different <code class="code docutils literal notranslate"><span class="pre">NaN</span></code> bit patterns are treated as
+distinct values, and <code class="code docutils literal notranslate"><span class="pre">+0.0</span></code> and <code class="code docutils literal notranslate"><span class="pre">-0.0</span></code> are considered different if their bit
+representations differ.</p>
+<p id="op-attribute-cuda-tile-atomic-cas-tko-memoryorderingsemantics-attr">The <code class="code docutils literal notranslate"><span class="pre">memory_ordering_semantics</span></code> attribute specifies the concurrency assumption between memory accesses in different threads, which controls the synchronization required.
+For example, <code class="code docutils literal notranslate"><span class="pre">weak</span></code> ordering allows the compiler to assume that there are no concurrent accesses to any accessed location.
+For more information, refer to the <a class="reference internal" href="memory_model.html#section-memory-model"><span class="std std-ref">memory model section</span></a> of the specification.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">relaxed</span></code> - There may be concurrent access to the location, but this access does not establish a happens-before relationship.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">acquire</span></code> -  There may be concurrent accesses to the location. If this acquire observes a release operation, then <em>happens before</em> is established.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">release</span></code> - There may be concurrent access to the location. If this release is observed with an acquire operation, then <em>happens before</em> is established.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">acq_rel</span></code> - There may be concurrent accesses to the location. This has the effect of both a release and acquire operation.</p></li>
+</ul>
+<p>Note: The following variants are not supported by this operation: <code class="code docutils literal notranslate"><span class="pre">weak</span></code>.</p>
+<p id="op-attribute-cuda-tile-atomic-cas-tko-memoryscope-attr">The <code class="code docutils literal notranslate"><span class="pre">memory_scope</span></code> attribute specifies a communication scope for memory operations.
+When communicating with other concurrent threads in the system, the scope must be broad enough to encompass all other
+threads which are participating in the communication, or data races may occur.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">tl_blk</span></code> - There may be concurrent accesses from within the same tile block.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">device</span></code> - There may be concurrent accesses from within the same device (i.e., GPU).</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">sys</span></code> - There may be concurrent accesses from anywhere within the system (i.e., all devices).</p></li>
+</ul>
+</section>
+<section id="id366">
+<h4>Constraints<a class="headerlink" href="#id366" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">cmp</span></code>, <code class="code docutils literal notranslate"><span class="pre">val</span></code> and <code class="code docutils literal notranslate"><span class="pre">result</span></code> must have the same shape and element type (<a class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span class="std std-ref">tile</span></a>).</p></li>
+<li><p>The operation must encode variadic operand segment sizes in attributes.</p></li>
+<li><p>The operation’s result type may be inferred from its operands and attributes.</p></li>
+</ul>
+</section>
+<section id="id367">
+<h4>Examples<a class="headerlink" href="#id367" title="Link to this heading">#</a></h4>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell131" tabindex="-1"><span></span><span class="nv">%ptr_1x </span><span class="o">= </span><span class="nf">reshape</span><span class="w"> </span><span class="nv">%ptr</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">ptr</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">1xptr</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span>
+<span class="nv">%ptr_vec </span><span class="o">= </span><span class="nf">broadcast</span><span class="w"> </span><span class="nv">%ptr_1x</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">1xptr</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span>
+<span class="nv">%offsets </span><span class="o">= </span><span class="nf">iota</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span>
+<span class="nv">%ptrs </span><span class="o">= </span><span class="nf">offset</span><span class="w"> </span><span class="nv">%ptr_vec</span><span class="p">,</span><span class="w"> </span><span class="nv">%offsets</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span>
+<span class="nv">%cmp </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">]</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span>
+<span class="nv">%val </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span>
+<span class="nv">%mask </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi1</span><span class="o">&gt;</span>
+
+<span class="c1">// Atomic CAS without input token.</span>
+<span class="nv">%0</span><span class="p">,</span><span class="w"> </span><span class="nv">%token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atomic_cas_tko</span><span class="w"> </span><span class="n">relaxed</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="nv">%ptrs</span><span class="p">,</span><span class="w"> </span><span class="nv">%cmp</span><span class="p">,</span><span class="w"> </span><span class="nv">%val</span><span class="w"> </span><span class="p">:</span>
+<span class="w">  </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">token</span>
+
+<span class="c1">// Atomic CAS without input token.</span>
+<span class="nv">%1</span><span class="p">,</span><span class="w"> </span><span class="nv">%token1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atomic_cas_tko</span><span class="w"> </span><span class="n">relaxed</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="nv">%ptrs</span><span class="p">,</span><span class="w"> </span><span class="nv">%cmp</span><span class="p">,</span><span class="w"> </span><span class="nv">%val</span><span class="p">,</span><span class="w"> </span><span class="nv">%mask</span><span class="w"> </span><span class="p">:</span>
+<span class="w">  </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi1</span><span class="o">&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">token</span>
+
+<span class="c1">// Atomic CAS with input token.</span>
+<span class="nv">%token2 </span><span class="o">= </span><span class="nf">make_token</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">token</span>
+<span class="nv">%2</span><span class="p">,</span><span class="w"> </span><span class="nv">%token3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atomic_cas_tko</span><span class="w"> </span><span class="n">relaxed</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="nv">%ptrs</span><span class="p">,</span><span class="w"> </span><span class="nv">%cmp</span><span class="p">,</span><span class="w"> </span><span class="nv">%val</span><span class="w"> </span><span class="n">token</span><span class="o">=%</span><span class="n">token2</span><span class="w"> </span><span class="p">:</span>
+<span class="w">  </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">token</span>
+
+<span class="nf">return</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell131">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-atomic-cas-tko-0"><span class="std std-ref">cuda_tile.atomic_cas_tko_0</span></a> for the full example listing.</p>
+</section>
+</section>
+<section id="cuda-tile-atomic-rmw-tko">
+<span id="op-cuda-tile-atomic-rmw-tko"></span><h3><span class="section-number">8.10.2. </span>cuda_tile.atomic_rmw_tko<a class="headerlink" href="#cuda-tile-atomic-rmw-tko" title="Link to this heading">#</a></h3>
+<p><em>Atomic read-modify-write on global memory</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre id="codecell132" tabindex="-1"><span></span><span class="n">cuda_tile</span><span class="o">.</span><span class="n">atomic_rmw_tko</span> <span class="o">%</span><span class="n">memory_ordering_semantics</span> <span class="o">%</span><span class="n">memory_scope</span> <span class="o">%</span><span class="n">pointers</span> <span class="o">%</span><span class="n">mode</span> <span class="o">%</span><span class="n">arg</span> <span class="o">%</span><span class="n">mask</span> <span class="o">%</span><span class="n">token</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell132">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<section id="id368">
+<h4>Parameters<a class="headerlink" href="#id368" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>memory_ordering_semantics</strong> (<a class="tile-ir-type notranslate reference internal" href="#op-attribute-cuda-tile-atomic-rmw-tko-memoryorderingsemantics-attr"><span class="std std-ref">MemoryOrderingSemantics</span></a>) - The memory ordering semantics for the load operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>memory_scope</strong> (<a class="tile-ir-type notranslate reference internal" href="#op-attribute-cuda-tile-atomic-rmw-tko-memoryscope-attr"><span class="std std-ref">MemoryScope</span></a>) - The memory scope for the atomic operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>pointers</strong> (<a class="tile-ir-type notranslate reference internal" href="types.html#type-ptr"><span class="std std-ref">ptr</span></a>) - The pointer tile to perform atomic operation on. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>mode</strong> (<a class="tile-ir-type notranslate reference internal" href="#op-attribute-cuda-tile-atomic-rmw-tko-atomicrmwmode-attr"><span class="std std-ref">AtomicRMWMode</span></a>) - The atomic operation mode (e.g., add, max, min, etc.). <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>arg</strong> (<a class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span class="std std-ref">tile</span></a>) - The value tile to use in the atomic operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>mask</strong> (<a class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span class="std std-ref">tile</span></a><span>&lt;</span><a class="tile-ir-type notranslate reference internal" href="types.html#subsection-element-types"><span class="std std-ref">i1</span></a><span class="tile-ir-type notranslate">&gt;</span>) - The mask for the load operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>token</strong> (<a class="tile-ir-type notranslate reference internal" href="#type-token"><span class="std std-ref">token</span></a>) - The token for the atomic operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+</ul>
+</section>
+<section id="id369">
+<h4>Results<a class="headerlink" href="#id369" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>result</strong> (<a class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span class="std std-ref">tile</span></a>) - The result of the atomic operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>result_token</strong> (<a class="tile-ir-type notranslate reference internal" href="#type-token"><span class="std std-ref">token</span></a>) - The result token of the load operation. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+</ul>
+</section>
+<section id="id370">
+<h4>Description<a class="headerlink" href="#id370" title="Link to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">atomic_rmw_tko</span></code> operation performs element-wise, atomic
+read-modify-write operations at the global memory locations specified
+by <code class="code docutils literal notranslate"><span class="pre">pointers</span></code>. The values written to memory are determined by
+<code class="code docutils literal notranslate"><span class="pre">mode</span></code> and <code class="code docutils literal notranslate"><span class="pre">arg</span></code>. The operation returns the original value
+stored at each location before the atomic update.</p>
+<p>The shapes of <code class="code docutils literal notranslate"><span class="pre">pointers</span></code>, <code class="code docutils literal notranslate"><span class="pre">arg</span></code>, and <code class="code docutils literal notranslate"><span class="pre">result</span></code> must
+match. The element type of the pointer type must match the element types
+of both <code class="code docutils literal notranslate"><span class="pre">arg</span></code> and <code class="code docutils literal notranslate"><span class="pre">result</span></code>. Each (pointer, arg) pair is
+processed in a single atomic transaction.</p>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell133" tabindex="-1"><span></span><span class="nf">atomic</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">pointer</span>
+<span class="w">  </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mode</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">arg</span><span class="p">)</span>
+<span class="w">  </span><span class="o">*</span><span class="n">pointer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span>
+<span class="w">  </span><span class="n">return</span><span class="w"> </span><span class="n">x</span>
+<span class="p">}</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell133">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>An optional parameter, <code class="code docutils literal notranslate"><span class="pre">mask</span></code>, specifies which elements participate
+in the atomic operation. A <cite>False</cite> value at position <code class="code docutils literal notranslate"><span class="pre">i</span></code> excludes
+the corresponding element in <code class="code docutils literal notranslate"><span class="pre">pointers</span></code> from the operation.
+The value returned for a masked-out element is implementation-defined.
+The shape of <code class="code docutils literal notranslate"><span class="pre">mask</span></code> must match the shape of <code class="code docutils literal notranslate"><span class="pre">pointers</span></code>.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">atomic_addf</span></code> operation is defined to round to the nearest even value.
+.. note::
+The current implementation of the compiler flushes denormals to zero. This behavior
+will be fixed in a future version of the compiler and users should not rely on it.</p>
+<p>Token-ordered atomic read-modify-write operations are not constrained by
+program order. The compiler may reorder them (i.e., move them earlier or
+later in the program) unless further constrained by tokens.</p>
+<dl class="simple">
+<dt>Supported data types by <code class="code docutils literal notranslate"><span class="pre">mode</span></code>:</dt><dd><ul class="simple">
+<li><p>ADD, AND, MAX, MIN, OR, UMAX, UMIN, XOR: i32, i64</p></li>
+<li><p>ADDF: f16, f32, f64</p></li>
+<li><p>XCHF: i32, i64, f32, f64</p></li>
+</ul>
+</dd>
+</dl>
+<p>The <code class="code docutils literal notranslate"><span class="pre">U</span></code> prefix in UMAX and UMIN distinguishes these from their
+signed counterparts (MAX and MIN) by interpreting the comparison as
+unsigned.</p>
+<p id="op-attribute-cuda-tile-atomic-rmw-tko-memoryorderingsemantics-attr">The <code class="code docutils literal notranslate"><span class="pre">memory_ordering_semantics</span></code> attribute specifies the concurrency assumption between memory accesses in different threads, which controls the synchronization required.
+For example, <code class="code docutils literal notranslate"><span class="pre">weak</span></code> ordering allows the compiler to assume that there are no concurrent accesses to any accessed location.
+For more information, refer to the <a class="reference internal" href="memory_model.html#section-memory-model"><span class="std std-ref">memory model section</span></a> of the specification.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">relaxed</span></code> - There may be concurrent access to the location, but this access does not establish a happens-before relationship.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">acquire</span></code> -  There may be concurrent accesses to the location. If this acquire observes a release operation, then <em>happens before</em> is established.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">release</span></code> - There may be concurrent access to the location. If this release is observed with an acquire operation, then <em>happens before</em> is established.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">acq_rel</span></code> - There may be concurrent accesses to the location. This has the effect of both a release and acquire operation.</p></li>
+</ul>
+<p>Note: The following variants are not supported by this operation: <code class="code docutils literal notranslate"><span class="pre">weak</span></code>.</p>
+<p id="op-attribute-cuda-tile-atomic-rmw-tko-memoryscope-attr">The <code class="code docutils literal notranslate"><span class="pre">memory_scope</span></code> attribute specifies a communication scope for memory operations.
+When communicating with other concurrent threads in the system, the scope must be broad enough to encompass all other
+threads which are participating in the communication, or data races may occur.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">tl_blk</span></code> - There may be concurrent accesses from within the same tile block.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">device</span></code> - There may be concurrent accesses from within the same device (i.e., GPU).</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">sys</span></code> - There may be concurrent accesses from anywhere within the system (i.e., all devices).</p></li>
+</ul>
+<p id="op-attribute-cuda-tile-atomic-rmw-tko-atomicrmwmode-attr">The <code class="code docutils literal notranslate"><span class="pre">mode</span></code> attribute specifies the mode of the atomic read-modify-write operation.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">and</span></code> - Perform bitwise AND as the modification operation.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">or</span></code> - Perform bitwise OR as the modification operation.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">xor</span></code> - Perform bitwise XOR as the modification operation.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">add</span></code> - Perform integer addition as the modification operation.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">addf</span></code> - Perform floating-point addition as the modification operation.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">max</span></code> - Perform maximum as the modification operation.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">min</span></code> - Perform minimum as the modification operation.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">umax</span></code> - Perform unsigned maximum as the modification operation.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">umin</span></code> - Perform unsigned minimum as the modification operation.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">xchg</span></code> - Perform exchange as the modification operation.</p></li>
+</ul>
+<p>The <code class="code docutils literal notranslate"><span class="pre">mode</span></code> attribute has a default value of <code class="code docutils literal notranslate"><span class="pre">add</span></code>.</p>
+</section>
+<section id="id371">
+<h4>Constraints<a class="headerlink" href="#id371" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">arg</span></code> and <code class="code docutils literal notranslate"><span class="pre">result</span></code> must have the same shape and element type (<a class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span class="std std-ref">tile</span></a>).</p></li>
+<li><p>The operation must encode variadic operand segment sizes in attributes.</p></li>
+<li><p>The operation’s result type may be inferred from its operands and attributes.</p></li>
+</ul>
+</section>
+<section id="id372">
+<h4>Examples<a class="headerlink" href="#id372" title="Link to this heading">#</a></h4>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell134" tabindex="-1"><span></span><span class="c1">// Reshape the input pointer tile to have a 1d shape</span>
+<span class="nv">%ptr_1x </span><span class="o">= </span><span class="nf">reshape</span><span class="w"> </span><span class="nv">%ptr</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">ptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">1xptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span>
+<span class="c1">// Broadcast the reshaped tile to a tile with 8 rows, effectively replicating the pointer 8 times</span>
+<span class="nv">%ptr_vec </span><span class="o">= </span><span class="nf">broadcast</span><span class="w"> </span><span class="nv">%ptr_1x</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">1xptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span>
+<span class="c1">// Create a tile of offsets [0, 1, 2, ..., 7] to index into memory</span>
+<span class="nv">%offsets </span><span class="o">= </span><span class="nf">iota</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span>
+<span class="c1">// Add the offsets to each pointer in the vector to create 8 unique pointers</span>
+<span class="nv">%ptrs </span><span class="o">= </span><span class="nf">offset</span><span class="w"> </span><span class="nv">%ptr_vec</span><span class="p">,</span><span class="w"> </span><span class="nv">%offsets</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span>
+<span class="nv">%vals </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="p">[</span><span class="mf">7.0</span><span class="p">,</span><span class="w"> </span><span class="mf">6.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">]</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xf32</span><span class="o">&gt;</span>
+
+<span class="c1">// Perform atomic addf operations on the memory locations pointed by %ptrs</span>
+<span class="c1">// without requiring an input token. Returns the original values and a result token</span>
+<span class="nv">%0</span><span class="p">,</span><span class="w"> </span><span class="nv">%res_token0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atomic_rmw_tko</span><span class="w"> </span><span class="n">relaxed</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="nv">%ptrs</span><span class="p">,</span><span class="w"> </span><span class="n">addf</span><span class="p">,</span><span class="w"> </span><span class="nv">%vals</span><span class="w"> </span><span class="p">:</span>
+<span class="w">    </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xf32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xf32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">token</span>
+
+<span class="c1">// Perform atomic add operations again, this time using the explicit input token</span>
+<span class="nv">%token </span><span class="o">= </span><span class="nf">make_token</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">token</span>
+<span class="nv">%1</span><span class="p">,</span><span class="w"> </span><span class="nv">%res_token1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atomic_rmw_tko</span><span class="w"> </span><span class="n">relaxed</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="nv">%ptrs</span><span class="p">,</span><span class="w"> </span><span class="n">addf</span><span class="p">,</span><span class="w"> </span><span class="nv">%vals</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">%token</span><span class="w"> </span><span class="p">:</span>
+<span class="w">    </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xf32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xf32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">token</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell134">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-atomic-rmw-tko-0"><span class="std std-ref">cuda_tile.atomic_rmw_tko_0</span></a> for the full example listing.</p>
+</section>
+</section>
+</section>
