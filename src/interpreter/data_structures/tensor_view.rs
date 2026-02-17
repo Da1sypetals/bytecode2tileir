@@ -53,8 +53,11 @@ impl TensorView {
         assert_eq!(
             shape.len(),
             strides.len(),
-            "Shape and strides must have the same length"
+            "Shape and strides must have the same length, but got shape.len() = {}, strides.len() = {}",
+            shape.len(),
+            strides.len()
         );
+
         TensorView {
             base_ptr,
             elem_type,

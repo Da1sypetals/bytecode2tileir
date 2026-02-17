@@ -10,7 +10,7 @@ pub struct ExecutionContext<'a> {
     pub arena: &'a IrArena,
 
     /// SSA value storage: ValueId -> Runtime Value.
-    values: HashMap<u32, Value>,
+    pub(crate) values: HashMap<u32, Value>,
 
     /// Current tile block coordinates (x, y, z).
     pub tile_block_id: [u32; 3],
@@ -29,16 +29,34 @@ unsafe impl Sync for ExecutionContext<'_> {}
 unsafe impl Send for ExecutionContext<'_> {}
 
 impl<'a> ExecutionContext<'a> {
+    /// Create a new execution context.
+    ///
+    /// # Arguments
+    /// * `arena` - Reference to the IR arena
+    /// * `tile_block_id` - Current tile block coordinates (x, y, z)
+    /// * `grid_size` - Total grid dimensions (x, y, z)
+    /// * `globals` - Global memory buffers
+    /// * `consts` - Constant pool
+    /// * `entry_block_args` - SSA ValueIds for the entry block's arguments
+    /// * `arg_values` - Runtime values to bind to the entry block arguments
     pub fn new(
         arena: &'a IrArena,
         tile_block_id: [u32; 3],
         grid_size: [u32; 3],
         globals: &'a HashMap<String, Value>,
         consts: &'a ConstPool,
+        entry_block_args: &[ValueId],
+        arg_values: &[Value],
     ) -> Self {
+        let values: HashMap<_, _> = entry_block_args
+            .iter()
+            .zip(arg_values.iter())
+            .map(|(value_id, value)| (value_id.0, value.clone()))
+            .collect();
+
         ExecutionContext {
             arena,
-            values: HashMap::new(),
+            values,
             tile_block_id,
             grid_size,
             globals,

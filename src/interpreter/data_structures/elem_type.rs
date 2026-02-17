@@ -83,6 +83,18 @@ impl Scalar {
     pub fn size_bytes(&self) -> usize {
         self.elem_type().size_bytes()
     }
+
+    /// Create a Scalar from an i64 value with the specified integer width
+    pub fn from_i64(value: i64, width: u8) -> Self {
+        match width {
+            1 => Scalar::Bool(value != 0),
+            8 => Scalar::I8(value as i8),
+            16 => Scalar::I16(value as i16),
+            32 => Scalar::I32(value as i32),
+            64 => Scalar::I64(value),
+            _ => panic!("Invalid integer width: {}", width),
+        }
+    }
 }
 
 impl ElemType {

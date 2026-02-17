@@ -277,8 +277,9 @@ impl ExecutionContext<'_> {
 
     /// 8.8.4. cuda_tile.cmpi - Element-wise integer comparison
     pub fn execute_cmpi(&mut self, op: &Operation) {
-        let lhs = self.get_value(op.operands[1]); // operands[0] = predicate
-        let rhs = self.get_value(op.operands[2]);
+        // cmpi %comparison_predicate %lhs %rhs %signedness
+        let lhs = self.get_value(op.operands[0]);
+        let rhs = self.get_value(op.operands[1]);
         let pred = self.extract_comparison_predicate_int(op);
         let signedness = self.extract_signedness_int(op);
 

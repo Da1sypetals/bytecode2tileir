@@ -1,5 +1,7 @@
 // Operation execution for TileIR interpreter.
 
+use std::collections::BTreeMap;
+
 use crate::cuda_tile_ir::Opcode;
 use crate::cuda_tile_ir::ids::OpId;
 use crate::interpreter::data_structures::interpreter::ExecutionContext;
@@ -94,9 +96,26 @@ impl ExecutionContext<'_> {
             Opcode::XOrI => self.execute_xori(op),
 
             // Miscellaneous operations from llm_docs/tileir/misc.md (8.10)
-            Opcode::Assume | Opcode::Print => println!("Omitted: {:?} @ {:?}", op.opcode, op.loc),
+            Opcode::Assume => self.execute_assume(op),
+            Opcode::Print => println!("Omitted: {:?} @ {:?}", op.opcode, op.loc),
 
-            _ => panic!("Opcode {:?} not implemented", op.opcode),
+            // View operations from llm_docs/tileir/views.md (8.11)
+            Opcode::GetIndexSpaceShape => self.execute_get_index_space_shape(op),
+            Opcode::GetTensorShape => self.execute_get_tensor_shape(op),
+            Opcode::LoadViewTko => self.execute_load_view_tko(op),
+            Opcode::MakePartitionView => self.execute_make_partition_view(op),
+            Opcode::MakeTensorView => self.execute_make_tensor_view(op),
+            Opcode::StoreViewTko => self.execute_store_view_tko(op),
+
+            // _ => panic!("Opcode {:?} not implemented", op.opcode),
+            _ => {
+                // Sort the keys (SSA ids)
+                for (k, v) in self.values.iter().collect::<BTreeMap<_, _>>() {
+                    println!("%{k}: {v:?}")
+                }
+
+                panic!("Opcode {:?} not implemented", op.opcode)
+            }
         }
     }
 }

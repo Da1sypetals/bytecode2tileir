@@ -10,6 +10,8 @@ pub mod integer;
 pub mod memory;
 pub mod tokens;
 pub mod type_conversion;
+pub mod views;
+pub mod misc;
 
 #[cfg(test)]
 mod tests;

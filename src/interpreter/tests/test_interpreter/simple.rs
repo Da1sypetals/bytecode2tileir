@@ -67,5 +67,6 @@ fn test_matmul_1() {
 
     let grid_size = [m / tm, n / tn, 1];
     intp.execute(args, grid_size);
+
     // TODO: expect to fail now.
 }

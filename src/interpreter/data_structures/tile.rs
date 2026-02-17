@@ -55,6 +55,21 @@ impl Tile {
     pub fn len(&self) -> usize {
         self.shape().iter().product()
     }
+
+    /// Create a scalar (0-dim) tile from a Scalar value
+    pub fn from_scalar(value: Scalar, _elem_type: ElemType) -> Self {
+        match value {
+            Scalar::Bool(v) => Tile::I1(Array::from_elem(IxDyn(&[]), v)),
+            Scalar::I8(v) => Tile::I8(Array::from_elem(IxDyn(&[]), v)),
+            Scalar::I16(v) => Tile::I16(Array::from_elem(IxDyn(&[]), v)),
+            Scalar::I32(v) => Tile::I32(Array::from_elem(IxDyn(&[]), v)),
+            Scalar::I64(v) => Tile::I64(Array::from_elem(IxDyn(&[]), v)),
+            Scalar::F16(v) => Tile::F16(Array::from_elem(IxDyn(&[]), v)),
+            Scalar::F32(v) => Tile::F32(Array::from_elem(IxDyn(&[]), v)),
+            Scalar::F64(v) => Tile::F64(Array::from_elem(IxDyn(&[]), v)),
+            Scalar::Ptr(v) => Tile::Ptr(Array::from_elem(IxDyn(&[]), v)),
+        }
+    }
 }
 
 impl Tile {

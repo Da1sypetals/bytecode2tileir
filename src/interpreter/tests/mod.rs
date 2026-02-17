@@ -7,3 +7,4 @@ mod test_interpreter;
 mod test_load_store;
 mod test_memory_ptr_ops;
 mod test_partition_view;
+mod test_views;

@@ -34,6 +34,11 @@ impl Interpreter {
         let func = self.arena.function_(func_id);
         let region = self.arena.region_(func.body);
 
+        // Get entry block's args (function parameters)
+        let entry_block_id = region.blocks[0];
+        let entry_block = self.arena.block_(entry_block_id);
+        let entry_block_args = &entry_block.args;
+
         for [ix, iy, iz] in ndrange(&grid_size) {
             let mut ctx = ExecutionContext::new(
                 self.arena(),
@@ -41,6 +46,8 @@ impl Interpreter {
                 grid_size.map(|x| x as u32),
                 &self.globals,
                 &self.consts,
+                entry_block_args,
+                &args,
             );
 
             // Iterate through each block in the region

@@ -28,3 +28,15 @@ pub fn type_to_elem_type(ty: &Type, arena: &IrArena) -> ElemType {
         _ => panic!("Type {:?} has no element type", ty),
     }
 }
+
+/// Convert an integer width to an element type.
+pub fn int_width_to_elem_type(width: u8) -> ElemType {
+    match width {
+        1 => ElemType::Bool,
+        8 => ElemType::I8,
+        16 => ElemType::I16,
+        32 => ElemType::I32,
+        64 => ElemType::I64,
+        _ => panic!("Invalid integer width: {}", width),
+    }
+}

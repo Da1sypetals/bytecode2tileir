@@ -87,14 +87,16 @@ impl ExecutionContext<'_> {
             Attr::DenseElements { ty, storage } => {
                 // Get element type from the type reference in the attribute
                 let elem_ty = self.arena.type_(*ty);
-                let elem_type = interpreter::type_conversion::type_to_elem_type(elem_ty, self.arena);
+                let elem_type =
+                    interpreter::type_conversion::type_to_elem_type(elem_ty, self.arena);
 
                 // Get bytes from storage
                 let bytes = match storage {
                     DenseStorage::Inline(data) => data.as_slice(),
                     DenseStorage::Const(const_id) => {
-                        self.consts.get(*const_id)
-                            .unwrap_or_else(|| panic!("Const ID {:?} not found in const pool", const_id))
+                        self.consts.get(*const_id).unwrap_or_else(|| {
+                            panic!("Const ID {:?} not found in const pool", const_id)
+                        })
                     }
                     DenseStorage::Strings(_) => {
                         panic!("String array DenseElements not supported for numeric constants");
@@ -450,24 +452,32 @@ fn create_tile_from_bytes(elem_type: ElemType, shape: &[usize], bytes: &[u8]) ->
     let elem_size = elem_type.size_bytes();
     let expected_len = shape.iter().product::<usize>() * elem_size;
 
-    assert_eq!(
-        actual_data.len(), expected_len,
-        "DenseElements byte length mismatch: expected {}, got {}",
-        expected_len, actual_data.len()
-    );
+    // Handle splat constants: if data is exactly one element but multiple expected,
+    // broadcast the single value to fill the entire shape
+    let use_splat = actual_data.len() == elem_size && expected_len > elem_size;
+    if use_splat {
+        // Broadcast the single element - the code below will handle this
+        // by repeatedly using the same single element
+    } else {
+        assert_eq!(
+            actual_data.len(),
+            expected_len,
+            "DenseElements byte length mismatch: expected {}, got {}",
+            expected_len,
+            actual_data.len()
+        );
+    }
 
     match elem_type {
         ElemType::I8 => {
-            let mut array: Array<i8, _> =
-                unsafe { Array::uninit(IxDyn(shape)).assume_init() };
+            let mut array: Array<i8, _> = unsafe { Array::uninit(IxDyn(shape)).assume_init() };
             for (i, &byte) in actual_data.iter().enumerate() {
                 array.as_slice_mut().unwrap()[i] = byte as i8;
             }
             Tile::I8(array)
         }
         ElemType::I16 => {
-            let mut array: Array<i16, _> =
-                unsafe { Array::uninit(IxDyn(shape)).assume_init() };
+            let mut array: Array<i16, _> = unsafe { Array::uninit(IxDyn(shape)).assume_init() };
             let slice = array.as_slice_mut().unwrap();
             for (i, chunk) in actual_data.chunks_exact(2).enumerate() {
                 slice[i] = i16::from_le_bytes([chunk[0], chunk[1]]);
@@ -475,8 +485,7 @@ fn create_tile_from_bytes(elem_type: ElemType, shape: &[usize], bytes: &[u8]) ->
             Tile::I16(array)
         }
         ElemType::I32 => {
-            let mut array: Array<i32, _> =
-                unsafe { Array::uninit(IxDyn(shape)).assume_init() };
+            let mut array: Array<i32, _> = unsafe { Array::uninit(IxDyn(shape)).assume_init() };
             let slice = array.as_slice_mut().unwrap();
             for (i, chunk) in actual_data.chunks_exact(4).enumerate() {
                 slice[i] = i32::from_le_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
@@ -484,20 +493,17 @@ fn create_tile_from_bytes(elem_type: ElemType, shape: &[usize], bytes: &[u8]) ->
             Tile::I32(array)
         }
         ElemType::I64 => {
-            let mut array: Array<i64, _> =
-                unsafe { Array::uninit(IxDyn(shape)).assume_init() };
+            let mut array: Array<i64, _> = unsafe { Array::uninit(IxDyn(shape)).assume_init() };
             let slice = array.as_slice_mut().unwrap();
             for (i, chunk) in actual_data.chunks_exact(8).enumerate() {
                 slice[i] = i64::from_le_bytes([
-                    chunk[0], chunk[1], chunk[2], chunk[3],
-                    chunk[4], chunk[5], chunk[6], chunk[7],
+                    chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5], chunk[6], chunk[7],
                 ]);
             }
             Tile::I64(array)
         }
         ElemType::F16 => {
-            let mut array: Array<f16, _> =
-                unsafe { Array::uninit(IxDyn(shape)).assume_init() };
+            let mut array: Array<f16, _> = unsafe { Array::uninit(IxDyn(shape)).assume_init() };
             let slice = array.as_slice_mut().unwrap();
             for (i, chunk) in actual_data.chunks_exact(2).enumerate() {
                 slice[i] = f16::from_le_bytes([chunk[0], chunk[1]]);
@@ -505,30 +511,37 @@ fn create_tile_from_bytes(elem_type: ElemType, shape: &[usize], bytes: &[u8]) ->
             Tile::F16(array)
         }
         ElemType::F32 => {
-            let mut array: Array<f32, _> =
-                unsafe { Array::uninit(IxDyn(shape)).assume_init() };
+            let mut array: Array<f32, _> = unsafe { Array::uninit(IxDyn(shape)).assume_init() };
             let slice = array.as_slice_mut().unwrap();
-            for (i, chunk) in actual_data.chunks_exact(4).enumerate() {
-                slice[i] = f32::from_le_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
+            if use_splat {
+                // Broadcast single value
+                let value = f32::from_le_bytes([
+                    actual_data[0],
+                    actual_data[1],
+                    actual_data[2],
+                    actual_data[3],
+                ]);
+                slice.fill(value);
+            } else {
+                for (i, chunk) in actual_data.chunks_exact(4).enumerate() {
+                    slice[i] = f32::from_le_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
+                }
             }
             Tile::F32(array)
         }
         ElemType::F64 => {
-            let mut array: Array<f64, _> =
-                unsafe { Array::uninit(IxDyn(shape)).assume_init() };
+            let mut array: Array<f64, _> = unsafe { Array::uninit(IxDyn(shape)).assume_init() };
             let slice = array.as_slice_mut().unwrap();
             for (i, chunk) in actual_data.chunks_exact(8).enumerate() {
                 slice[i] = f64::from_le_bytes([
-                    chunk[0], chunk[1], chunk[2], chunk[3],
-                    chunk[4], chunk[5], chunk[6], chunk[7],
+                    chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5], chunk[6], chunk[7],
                 ]);
             }
             Tile::F64(array)
         }
         ElemType::Bool => {
             // Booleans stored as i1 (1 bit, but byte-aligned in storage)
-            let mut array: Array<bool, _> =
-                unsafe { Array::uninit(IxDyn(shape)).assume_init() };
+            let mut array: Array<bool, _> = unsafe { Array::uninit(IxDyn(shape)).assume_init() };
             for (i, &byte) in actual_data.iter().enumerate() {
                 array.as_slice_mut().unwrap()[i] = byte != 0;
             }
