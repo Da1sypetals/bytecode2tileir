@@ -1,10 +1,10 @@
 // Operation execution for TileIR interpreter.
 
-use crate::cuda_tile_ir::ids::OpId;
-use crate::cuda_tile_ir::types::Dim;
 use crate::cuda_tile_ir::Opcode;
+use crate::cuda_tile_ir::ids::OpId;
+use crate::interpreter::data_structures::interpreter::ExecutionContext;
 
-impl crate::interpreter::data_structures::interpreter::ExecutionContext<'_> {
+impl ExecutionContext<'_> {
     pub fn execute_op(&mut self, op_id: OpId) {
         let op = self.arena.op_(op_id);
 

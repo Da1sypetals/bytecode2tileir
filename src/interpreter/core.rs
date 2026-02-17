@@ -959,6 +959,8 @@ impl Tile {
     }
 
     pub fn select(&self, val_if_true: &Tile, val_if_false: &Tile) -> Self {
+        // FIXME: should NOT use Vec to collect results
+        // Should use Zip / mapv or something.
         assert_eq!(
             self.shape(),
             val_if_true.shape(),

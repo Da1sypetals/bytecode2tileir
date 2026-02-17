@@ -1,7 +1,9 @@
+pub mod args;
 pub mod bitwise;
 pub mod conversions;
 pub mod core;
 pub mod data_structures;
+pub mod entry;
 pub mod execute;
 pub mod float;
 pub mod integer;

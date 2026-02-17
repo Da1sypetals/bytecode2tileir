@@ -71,6 +71,10 @@ impl ExecutionContext<'_> {
         let result_value_data = self.arena.value_(result_value_id);
         let result_ty = self.arena.type_(result_value_data.ty());
 
+        // For now:
+        // Ignore the pointee-type on the pointer
+        // Infer the pointee data type with the result data type.
+        // This could be a problem when there is a mismatch.
         let (result_shape, elem_type) = match result_ty {
             Type::Tile { element, shape } => {
                 let elem_ty = self.arena.type_(*element);
