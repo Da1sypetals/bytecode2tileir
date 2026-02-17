@@ -1,0 +1,361 @@
+<section id="miscellaneous">
+<span id="op-group-miscellaneous"></span><h2><span class="section-number">8.12. </span>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Link to this heading">#</a></h2>
+<p>The set of miscellaneous operations in <strong>Tile IR</strong> are operations which do not have a specific category.</p>
+<section id="cuda-tile-assume">
+<span id="op-cuda-tile-assume"></span><h3><span class="section-number">8.12.1. </span>cuda_tile.assume<a class="headerlink" href="#cuda-tile-assume" title="Link to this heading">#</a></h3>
+<p><em>Attach static information to an SSA value</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre id="codecell147" tabindex="-1"><span></span><span class="n">cuda_tile</span><span class="o">.</span><span class="n">assume</span> <span class="o">%</span><span class="n">value</span> <span class="o">%</span><span class="n">predicate</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell147">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<section id="id401">
+<h4>Parameters<a class="headerlink" href="#id401" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>value</strong> (<a class="tile-ir-type notranslate reference internal" href="#type-any"><span class="std std-ref">Any</span></a>) - The value to attach the predicate to. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>predicate</strong> (<a class="tile-ir-type notranslate reference internal" href="#op-attribute-cuda-tile-assume-assumepredicate-attr"><span class="std std-ref">AssumePredicate</span></a>) - The predicate to attach to the value. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+</ul>
+</section>
+<section id="id402">
+<h4>Results<a class="headerlink" href="#id402" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>result</strong> (<a class="tile-ir-type notranslate reference internal" href="#type-any"><span class="std std-ref">Any</span></a>) - The value with the attached predicate. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+</ul>
+</section>
+<section id="id403">
+<h4>Description<a class="headerlink" href="#id403" title="Link to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">assume</span></code> operation passes through :code`value` as the result and
+attaches a predicate to it. The assumed predicate is a property of
+<code class="code docutils literal notranslate"><span class="pre">result</span></code>.</p>
+<p>This operation can be used to inject static information into the compiler,
+potentially resulting in more efficient code generation.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">predicate</span></code> must implement the <code class="code docutils literal notranslate"><span class="pre">AssumePredicateAttrInterface</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="code docutils literal notranslate"><span class="pre">assume</span></code> does not check the correctness of the predicate.
+Incorrect predicates may inject incorrect static information and cause
+miscompilation. If an incorrect predicate is attached to an SSA value,
+the behavior of the program is undefined.</p>
+</div>
+</section>
+<section id="assumepredicate-implementers">
+<span id="op-attribute-cuda-tile-assume-assumepredicate-attr"></span><h4>AssumePredicate Implementers<a class="headerlink" href="#assumepredicate-implementers" title="Link to this heading">#</a></h4>
+</section>
+<section id="bounded">
+<h4>Bounded<a class="headerlink" href="#bounded" title="Link to this heading">#</a></h4>
+<div class="highlight-mlir notranslate" id="op-attribute-cuda-tile-assume-bounded-attr"><div class="highlight"><pre id="codecell148" tabindex="-1"><span></span><span class="k">#bounded</span><span class="o">&lt;</span><span class="p">(</span><span class="n">lb</span><span class="o">|</span>?<span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="n">ub</span><span class="o">|</span>?<span class="p">)</span><span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell148">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">bounded</span></code> attribute must be used as a predicate for
+<code class="code docutils literal notranslate"><span class="pre">cuda_tile.assume</span></code>. The predicated value must be a tile of integers.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">bounded</span></code> specifies a lower and upper bound for all elements of the
+predicated tile when interpreted as signed integers. Bounds are optional:
+it is possible to leave a bound unspecified, as indicated by “?” in the
+assembly format. E.g., <code class="code docutils literal notranslate"><span class="pre">#bounded&lt;0,</span> <span class="pre">?&gt;</span></code>. Both lower bound and upper
+bound are inclusive.</p>
+<p>The lower bounds must be less than or equal to the upper bound. A lower/
+upper bound that exceeds the range of valid values of the predicated value
+is invalid.</p>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell149" tabindex="-1"><span></span><span class="nv">%1 </span><span class="o">= </span><span class="nf">cuda_tile.assume</span><span class="w"> </span><span class="k">#cuda_tile.bounded</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span>?<span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%0</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">x</span><span class="mi">8</span><span class="o">x</span><span class="n n-Type">i16</span><span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell149">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-assume-example-bounded-0"><span class="std std-ref">cuda_tile.assume_example_Bounded_0</span></a> for the full example listing.</p>
+</section>
+<section id="divby">
+<h4>DivBy<a class="headerlink" href="#divby" title="Link to this heading">#</a></h4>
+<div class="highlight-mlir notranslate" id="op-attribute-cuda-tile-assume-divby-attr"><div class="highlight"><pre id="codecell150" tabindex="-1"><span></span><span class="n">div_by</span><span class="o">&lt;</span><span class="w"> </span>$<span class="n">divisor</span><span class="w"> </span><span class="p">(,</span><span class="w"> </span><span class="n">every</span><span class="w"> </span>$<span class="n">every</span>^<span class="w"> </span><span class="n">along</span><span class="w"> </span>$<span class="n">along</span><span class="p">)</span>?<span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell150">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">div_by</span></code> attribute must be used as a predicate for <code class="code docutils literal notranslate"><span class="pre">cuda_tile.assume</span></code>
+ops. The predicated value must be a <code class="code docutils literal notranslate"><span class="pre">tile</span></code> of integers or pointers, or
+a <code class="code docutils literal notranslate"><span class="pre">tensor_view</span></code>.</p>
+<p>If the predicated value is a <code class="code docutils literal notranslate"><span class="pre">tile</span></code>, the attribute indicates that some
+elements of the <code class="code docutils literal notranslate"><span class="pre">tile</span></code> are divisible by <code class="code docutils literal notranslate"><span class="pre">divisor</span></code>. If the predicated value
+is a <code class="code docutils literal notranslate"><span class="pre">tensor_view</span></code> the attribute indicates that the base address of the <code class="code docutils literal notranslate"><span class="pre">tensor_view</span></code> is
+divisible by <code class="code docutils literal notranslate"><span class="pre">divisor</span></code>. <code class="code docutils literal notranslate"><span class="pre">divisor</span></code> must be a positive power of <code class="code docutils literal notranslate"><span class="pre">2</span></code>.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">every</span></code> and <code class="code docutils literal notranslate"><span class="pre">along</span></code> attributes control which elements are assumed to
+satisfy the divisibility property. When splitting the tensor in groups of
+size <code class="code docutils literal notranslate"><span class="pre">every</span></code> along dimension <code class="code docutils literal notranslate"><span class="pre">along</span></code>, the first element of each group is
+assumed to satisfy the divisibility property. The other elements are
+assumed to be monotonically increasing by <code class="code docutils literal notranslate"><span class="pre">1</span></code> within the group. In case
+of a <code class="code docutils literal notranslate"><span class="pre">tile</span></code> of pointers, the elements are assumed to be monotonically
+increasing by the byte width of the pointee type. The size of the last
+group may be smaller than <code class="code docutils literal notranslate"><span class="pre">every</span></code>.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">every</span></code> and <code class="code docutils literal notranslate"><span class="pre">along</span></code> attributes are optional. When missing, they are
+assumed to have a default value of <code class="code docutils literal notranslate"><span class="pre">1</span></code> and <code class="code docutils literal notranslate"><span class="pre">0</span></code> in case of a <code class="code docutils literal notranslate"><span class="pre">tile</span></code>.
+I.e., all elements of the <code class="code docutils literal notranslate"><span class="pre">tile</span></code> are assumed to satisfy the divisibility
+property. (The value of <code class="code docutils literal notranslate"><span class="pre">along</span></code> does not matter in that case.) If the
+predicated value is a <code class="code docutils literal notranslate"><span class="pre">tensor_view</span></code> or a 0D <code class="code docutils literal notranslate"><span class="pre">tile</span></code>, <code class="code docutils literal notranslate"><span class="pre">every</span></code> and <code class="code docutils literal notranslate"><span class="pre">along</span></code> cannot be
+used.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">every</span></code>, and <code class="code docutils literal notranslate"><span class="pre">along</span></code> must be used together. If one is specified,
+so must be the other.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the predicated value is a tile of integers, <code class="code docutils literal notranslate"><span class="pre">every</span></code> is a property of
+the signed interpretation of the integer values. Otherwise, it is a
+property of the unsigned integer interpretation. E.g., <code class="code docutils literal notranslate"><span class="pre">every</span> <span class="pre">=</span> <span class="pre">4</span></code>
+is incorrect for the following sequence of “i8” values (written in binary
+form) because they wrap around when interpreted as signed integers:
+<code class="code docutils literal notranslate"><span class="pre">[01111110,</span> <span class="pre">01111111,</span> <span class="pre">10000000,</span> <span class="pre">10000001]</span></code>. <code class="code docutils literal notranslate"><span class="pre">every</span> <span class="pre">=</span> <span class="pre">2</span></code> would
+be correct.</p>
+</div>
+<p>The examples below demonstrate tensors that satisfy the assumed properties.</p>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell151" tabindex="-1"><span></span><span class="c1">// Example 1: Each pointer is divisible by 16.</span>
+<span class="c1">// [ 0x10, 0x20, 0x80, 0x10, 0x0, 0x120, ... ]</span>
+<span class="nv">%0 </span><span class="o">= </span><span class="nf">cuda_tile.assume</span><span class="w"> </span><span class="k">#cuda_tile.div_by</span><span class="o">&lt;</span><span class="mi">16</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%ptrs</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="mi">128</span><span class="o">x</span><span class="n n-Type">!cuda_tile.ptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span>
+<span class="c1">// Note: Equivalent to #cuda_tile.div_by&lt;16, every 1 along 0&gt;.</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell151">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-assume-example-divby-0"><span class="std std-ref">cuda_tile.assume_example_DivBy_0</span></a> for the full example listing.</p>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell152" tabindex="-1"><span></span><span class="c1">// Example 2: Each integer is divisible by 4.</span>
+<span class="c1">// [ 16, 24, 8, 4, 12, 12, 0, 16, ... ]</span>
+<span class="nv">%0 </span><span class="o">= </span><span class="nf">cuda_tile.assume</span><span class="w"> </span><span class="k">#cuda_tile.div_by</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%t</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="mi">128</span><span class="o">x</span><span class="n n-Type">i32</span><span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell152">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-assume-example-divby-1"><span class="std std-ref">cuda_tile.assume_example_DivBy_1</span></a> for the full example listing.</p>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell153" tabindex="-1"><span></span><span class="c1">// Example 3: Group size [4].</span>
+<span class="c1">// [7, 8, 9, 10, 23, 24, 25, 26, 0, 1, 2, 3, ...]</span>
+<span class="nv">%0 </span><span class="o">= </span><span class="nf">cuda_tile.assume</span><span class="w"> </span><span class="k">#cuda_tile.div_by</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">every</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="n">along</span><span class="w"> </span><span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%t</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="mi">128</span><span class="o">x</span><span class="n n-Type">i32</span><span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell153">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-assume-example-divby-2"><span class="std std-ref">cuda_tile.assume_example_DivBy_2</span></a> for the full example listing.</p>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell154" tabindex="-1"><span></span><span class="c1">// Example 4: 2-d Group size [1, 4] with divisibility 4.</span>
+<span class="c1">// [ [  4,  5,  6,  7, 12, 13, 14, 15 ],</span>
+<span class="c1">//   [  8,  9, 10, 11, 24, 25, 26, 27 ],</span>
+<span class="c1">//   [ 24, 25, 26, 27, 64, 65, 66, 67 ],</span>
+<span class="c1">//   [  0,  1,  2,  3,  4,  5,  6,  7 ] ]</span>
+<span class="nv">%0 </span><span class="o">= </span><span class="nf">cuda_tile.assume</span><span class="w"> </span><span class="k">#cuda_tile.div_by</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">every</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="n">along</span><span class="w"> </span><span class="mi">1</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%t</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">x</span><span class="mi">8</span><span class="o">x</span><span class="n n-Type">i32</span><span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell154">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-assume-example-divby-3"><span class="std std-ref">cuda_tile.assume_example_DivBy_3</span></a> for the full example listing.</p>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell155" tabindex="-1"><span></span><span class="c1">// Example 5: 2-d Group size [4, 1] with divisibility 32.</span>
+<span class="c1">// Note that the elements within each column are monotonically increasing</span>
+<span class="c1">// by the byte width of the pointee type f32, e.g., 0x20, 0x24, 0x28, 0x2c.</span>
+<span class="c1">// [ [  0x20, 0x100,  0x40,  0x60,  0x40, 0x200, 0x340,  0x40 ],</span>
+<span class="c1">//   [  0x24, 0x104,  0x44,  0x64,  0x44, 0x204, 0x344,  0x44 ],</span>
+<span class="c1">//   [  0x28, 0x108,  0x48,  0x68,  0x48, 0x208, 0x348,  0x48 ],</span>
+<span class="c1">//   [  0x2c, 0x10c,  0x4c,  0x6c,  0x4c, 0x20c, 0x34c,  0x4c ] ]</span>
+<span class="nv">%0 </span><span class="o">= </span><span class="nf">cuda_tile.assume</span><span class="w"> </span><span class="k">#cuda_tile.div_by</span><span class="o">&lt;</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="n">every</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="n">along</span><span class="w"> </span><span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%ptrs</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">x</span><span class="mi">8</span><span class="o">x</span><span class="n n-Type">!cuda_tile.ptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell155">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-assume-example-divby-4"><span class="std std-ref">cuda_tile.assume_example_DivBy_4</span></a> for the full example listing.</p>
+</section>
+<section id="sameelements">
+<h4>SameElements<a class="headerlink" href="#sameelements" title="Link to this heading">#</a></h4>
+<div class="highlight-mlir notranslate" id="op-attribute-cuda-tile-assume-sameelements-attr"><div class="highlight"><pre id="codecell156" tabindex="-1"><span></span><span class="k">#same_elements</span><span class="o">&lt;</span><span class="w"> </span>$<span class="n">values</span><span class="w"> </span><span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell156">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">same_elements</span></code> attribute must be used as a predicate for
+<code class="code docutils literal notranslate"><span class="pre">cuda_tile.assume</span></code>. The predicated value must be a tensor of integers or
+pointers.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">same_elements</span></code> is specified for each dimension. A value of C for a
+dimension of size N indicates that, after dividing the respective
+dimension into N/C groups of size C, each group consists of the same
+elements. As N/C may not divide evenly, the last group may have fewer
+than C elements.</p>
+<p>If the “same elements” property does not hold along a dimension, the
+respective value should be set to 1.
+<code class="code docutils literal notranslate"><span class="pre">#cuda_tile.same_elements&lt;[1,</span> <span class="pre">1,</span> <span class="pre">...,</span> <span class="pre">1]&gt;</span></code> is a correct predicate for any
+tensor of integers or pointers, where the number of ones matches the rank
+of the tensor. (Size-1 groups always have the same elements.)</p>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell157" tabindex="-1"><span></span><span class="c1">// Integer tensor with same elements.</span>
+<span class="nv">%0 </span><span class="o">= </span><span class="nf">cuda_tile.constant</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">i16</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">],</span>
+<span class="w">                               </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">],</span>
+<span class="w">                               </span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">93</span><span class="p">,</span><span class="w"> </span><span class="mi">93</span><span class="p">,</span><span class="w"> </span><span class="mi">93</span><span class="p">,</span><span class="w"> </span><span class="mi">93</span><span class="p">],</span>
+<span class="w">                               </span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">93</span><span class="p">,</span><span class="w"> </span><span class="mi">93</span><span class="p">,</span><span class="w"> </span><span class="mi">93</span><span class="p">,</span><span class="w"> </span><span class="mi">93</span><span class="p">]]</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">4x8xi16</span><span class="o">&gt;</span>
+<span class="nv">%1 </span><span class="o">= </span><span class="nf">cuda_tile.assume</span><span class="w"> </span><span class="k">#cuda_tile.same_elements</span><span class="o">&lt;</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">]</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%0</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">x</span><span class="mi">8</span><span class="o">x</span><span class="n n-Type">i16</span><span class="o">&gt;</span>
+
+<span class="c1">// Pointer tensor with same elements.</span>
+<span class="nv">%2 </span><span class="o">= </span><span class="nf">cuda_tile.constant</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">i64</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">  </span><span class="mi">0</span><span class="p">,</span><span class="w">  </span><span class="mi">0</span><span class="p">,</span><span class="w">  </span><span class="mi">0</span><span class="p">,</span><span class="w">  </span><span class="mi">8</span><span class="p">,</span><span class="w">  </span><span class="mi">8</span><span class="p">,</span><span class="w">  </span><span class="mi">8</span><span class="p">,</span><span class="w">  </span><span class="mi">8</span><span class="p">],</span>
+<span class="w">                               </span><span class="p">[</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">  </span><span class="mi">0</span><span class="p">,</span><span class="w">  </span><span class="mi">0</span><span class="p">,</span><span class="w">  </span><span class="mi">0</span><span class="p">,</span><span class="w">  </span><span class="mi">8</span><span class="p">,</span><span class="w">  </span><span class="mi">8</span><span class="p">,</span><span class="w">  </span><span class="mi">8</span><span class="p">,</span><span class="w">  </span><span class="mi">8</span><span class="p">],</span>
+<span class="w">                               </span><span class="p">[</span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">],</span>
+<span class="w">                               </span><span class="p">[</span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">]]</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">4x8xi64</span><span class="o">&gt;</span>
+<span class="nv">%3 </span><span class="o">= </span><span class="nf">cuda_tile.bitcast</span><span class="w"> </span><span class="nv">%2</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">x</span><span class="mi">8</span><span class="o">x</span><span class="n n-Type">i64</span><span class="o">&gt;</span>
+<span class="w">      </span><span class="o">-&gt;</span><span class="w"> </span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="n n-Type">!cuda_tile.ptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span>
+<span class="nv">%4 </span><span class="o">= </span><span class="nf">cuda_tile.assume</span><span class="w"> </span><span class="k">#cuda_tile.same_elements</span><span class="o">&lt;</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">]</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%3</span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="n n-Type">!cuda_tile.ptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell157">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-assume-example-sameelements-0"><span class="std std-ref">cuda_tile.assume_example_SameElements_0</span></a> for the full example listing.</p>
+</section>
+<section id="id404">
+<h4>Constraints<a class="headerlink" href="#id404" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">value</span></code> and <code class="code docutils literal notranslate"><span class="pre">result</span></code> must have the same shape and element type (<a class="tile-ir-type notranslate reference internal" href="#type-any"><span class="std std-ref">Any</span></a>).</p></li>
+<li><p>The operation’s result type may be inferred from its operands and attributes.</p></li>
+</ul>
+</section>
+<section id="id405">
+<h4>Examples<a class="headerlink" href="#id405" title="Link to this heading">#</a></h4>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell158" tabindex="-1"><span></span><span class="c1">// Assume that all integers are divisible by 32.</span>
+<span class="nv">%int_tile </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">i16</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi16</span><span class="o">&gt;</span>
+<span class="nv">%div_by_1 </span><span class="o">= </span><span class="nf">assume</span><span class="w"> </span><span class="n">div_by</span><span class="o">&lt;</span><span class="mi">32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%int_tile</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi16</span><span class="o">&gt;</span>
+
+<span class="c1">// Assume that every 4th element (starting with element 0) along</span>
+<span class="c1">// dimension 0 is divisible by 32 that and all integers are</span>
+<span class="c1">// montonically increasing by 1 within each group of 4.</span>
+<span class="nv">%int_tile_2 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">i16</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">96</span><span class="p">,</span><span class="w"> </span><span class="mi">97</span><span class="p">,</span><span class="w"> </span><span class="mi">98</span><span class="p">,</span><span class="w"> </span><span class="mi">99</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">65</span><span class="p">,</span><span class="w"> </span><span class="mi">66</span><span class="p">,</span><span class="w"> </span><span class="mi">67</span><span class="p">]</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi16</span><span class="o">&gt;</span>
+<span class="nv">%div_by_2 </span><span class="o">= </span><span class="nf">assume</span><span class="w"> </span><span class="n">div_by</span><span class="o">&lt;</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="n">every</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="n">along</span><span class="w"> </span><span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%int_tile_2</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi16</span><span class="o">&gt;</span>
+
+<span class="c1">// Assume that every rectangular chunk of size [1, 4, 2] has the same</span>
+<span class="c1">// values.</span>
+<span class="nv">%ptr_3d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"</span><span class="s">dummy_producer</span><span class="s2">"</span><span class="p">()</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="n n-Type">!cuda_tile.tile</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">x</span><span class="mi">8</span><span class="o">x</span><span class="mi">8</span><span class="o">x</span><span class="n n-Type">ptr&lt;f32</span><span class="o">&gt;&gt;</span><span class="p">)</span>
+<span class="nv">%same_elem </span><span class="o">= </span><span class="nf">assume</span><span class="w"> </span><span class="n">same_elements</span><span class="o">&lt;</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">]</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%ptr_3d</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">1x8x8xptr</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span>
+
+<span class="c1">// Assume that every value is greater or equal to 5.</span>
+<span class="nv">%int_tile_3 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">i16</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">]</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi16</span><span class="o">&gt;</span>
+<span class="nv">%bounded </span><span class="o">= </span><span class="nf">assume</span><span class="w"> </span><span class="n">bounded</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span>?<span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nv">%int_tile_3</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">8xi16</span><span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell158">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-assume-0"><span class="std std-ref">cuda_tile.assume_0</span></a> for the full example listing.</p>
+</section>
+</section>
+<section id="cuda-tile-print">
+<span id="op-cuda-tile-print"></span><h3><span class="section-number">8.12.2. </span>cuda_tile.print<a class="headerlink" href="#cuda-tile-print" title="Link to this heading">#</a></h3>
+<p><em>Print a formatted string</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre id="codecell159" tabindex="-1"><span></span><span class="n">cuda_tile</span><span class="o">.</span><span class="n">print</span> <span class="o">%</span><span class="nb">str</span> <span class="o">%</span><span class="n">args</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell159">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<section id="id406">
+<h4>Parameters<a class="headerlink" href="#id406" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>str</strong> (<a class="tile-ir-type notranslate reference internal" href="#type-string"><span class="std std-ref">String</span></a>) - The format string. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+<li><p><strong>args</strong> (<a class="tile-ir-type notranslate reference internal" href="#type-variadic"><span class="std std-ref">Variadic</span></a><span>&lt;</span><a class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span class="std std-ref">tile</span></a><span class="tile-ir-type notranslate">&gt;</span>) - The arguments to format and print. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p></li>
+</ul>
+</section>
+<section id="id407">
+<h4>Results<a class="headerlink" href="#id407" title="Link to this heading">#</a></h4>
+<p>No results.</p>
+</section>
+<section id="id408">
+<h4>Description<a class="headerlink" href="#id408" title="Link to this heading">#</a></h4>
+<p>The <code class="code docutils literal notranslate"><span class="pre">print</span></code> operation prints a C-printf-style format string,
+interleaved with the given operands. The number of format expressions
+(starting with the <code class="code docutils literal notranslate"><span class="pre">%</span></code> character) must match the number of operands.
+If a format expression is not applicable to its respective operand, then
+the output is undefined.</p>
+<p>This operation is meant for debugging. Its implementation is not optimized
+for performance, so it should not be used in production mode. Moreover,
+prints may execute in an order that is different from the one in which they
+appear in the program.</p>
+</section>
+<section id="id409">
+<h4>Constraints<a class="headerlink" href="#id409" title="Link to this heading">#</a></h4>
+<p>No constraints.</p>
+</section>
+<section id="id410">
+<h4>Examples<a class="headerlink" href="#id410" title="Link to this heading">#</a></h4>
+<div class="highlight-mlir notranslate"><div class="highlight"><pre id="codecell160" tabindex="-1"><span></span><span class="nf">print</span><span class="w"> </span><span class="s2">"</span><span class="s">Hello world: %f</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span><span class="w"> </span><span class="nv">%arg</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">4xf32</span><span class="o">&gt;</span>
+<span class="nf">print</span><span class="w"> </span><span class="s2">"</span><span class="s">%+08.3f</span><span class="s2">"</span><span class="p">,</span><span class="w"> </span><span class="nv">%arg</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">4xf32</span><span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell160">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Copy to clipboard</title>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+  <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+</svg>
+    </button></div>
+</div>
+<p>See <a class="reference internal" href="appendix.html#example-cuda-tile-print-0"><span class="std std-ref">cuda_tile.print_0</span></a> for the full example listing.</p>
+</section>
+</section>
+</section>
