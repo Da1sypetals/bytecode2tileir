@@ -1,0 +1,945 @@
+<section id="views">
+    <span id="op-group-views"></span>
+    <h2><span class="section-number">8.11. </span>Views<a class="headerlink" href="#views"
+            title="Link to this heading">#</a></h2>
+    <p>Views are a structured way to interact with tensors in memory. They are described in both the types section <a
+            class="reference internal" href="types.html#sub-sec-view-types"><span class="std std-ref">Tensor
+                View</span></a> and the semantics section <a class="reference internal"
+            href="semantics.html#section-semantics-sub-section-views"><span class="std std-ref">Views</span></a>.</p>
+    <p>Views are the primary way to interact with global memory in <strong>Tile IR</strong>. A common pattern is to
+        construct a <a class="reference internal" href="types.html#type-tensor-view"><span class="std std-ref">Tensor
+                View</span></a> from a pointer with <a class="reference internal"
+            href="#op-cuda-tile-make-tensor-view"><span class="std std-ref">cuda_tile.make_tensor_view</span></a> and
+        then use
+        the <a class="reference internal" href="#op-cuda-tile-load-view-tko"><span
+                class="std std-ref">cuda_tile.load_view_tko</span></a> and <a class="reference internal"
+            href="#op-cuda-tile-store-view-tko"><span class="std std-ref">cuda_tile.store_view_tko</span></a> operations
+        to read and write to them. For larger tensors, loading the entire tensor is not efficient and
+        therefore we have a sub-view <a class="reference internal" href="types.html#type-partition-view"><span
+                class="std std-ref">Partition View</span></a> which allows a user to tile a <code
+            class="code docutils literal notranslate"><span class="pre">tensor_view</span></code>.</p>
+    <section id="cuda-tile-get-index-space-shape">
+        <span id="op-cuda-tile-get-index-space-shape"></span>
+        <h3><span class="section-number">8.11.1. </span>cuda_tile.get_index_space_shape<a class="headerlink"
+                href="#cuda-tile-get-index-space-shape" title="Link to this heading">#</a></h3>
+        <p><em>Return index space dimension size</em></p>
+        <div class="highlight-default notranslate">
+            <div class="highlight">
+                <pre id="codecell135" tabindex="-1"><span></span><span class="n">cuda_tile</span><span class="o">.</span><span class="n">get_index_space_shape</span> <span class="o">%</span><span class="n">src</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell135">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                        height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <title>Copy to clipboard</title>
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                        <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <section id="id373">
+            <h4>Parameters<a class="headerlink" href="#id373" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>src</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-view-type"><span class="std std-ref">view_type</span></a>) - The source view
+                        type. <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span>
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section id="id374">
+            <h4>Results<a class="headerlink" href="#id374" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <dl class="simple">
+                        <dt><strong>result</strong> (<a class="tile-ir-type notranslate reference internal"
+                                href="#type-variadic"><span class="std std-ref">Variadic</span></a><span>&lt;</span><a
+                                class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span
+                                    class="std std-ref">tile</span></a><span>&lt;</span><a
+                                class="tile-ir-type notranslate reference internal" href="#type-any"><span
+                                    class="std std-ref">any</span></a><span
+                                class="tile-ir-type notranslate">&gt;</span><span
+                                class="tile-ir-type notranslate">&gt;</span>) - The shape of the index space, each value
+                            representing the size of the</dt>
+                        <dd>
+                            <p>corresponding dimension. <span
+                                    class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span>
+                            </p>
+                        </dd>
+                    </dl>
+                </li>
+            </ul>
+        </section>
+        <section id="id375">
+            <h4>Description<a class="headerlink" href="#id375" title="Link to this heading">#</a></h4>
+            <p>The <code class="code docutils literal notranslate"><span class="pre">get_index_space_shape</span></code>
+                operation returns the shape of the index
+                space of <code class="code docutils literal notranslate"><span class="pre">src</span></code>.</p>
+            <p>The result types must be the same as the view’s index type,
+                and the number of results must be the same as the view’s index rank.</p>
+            <p>If the index space shape sizes do not fit within the provided type, behavior
+                is undefined.</p>
+        </section>
+        <section id="id376">
+            <h4>Constraints<a class="headerlink" href="#id376" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p>The operation is pure and does not perform any memory side effects.</p>
+                </li>
+            </ul>
+        </section>
+    </section>
+    <section id="cuda-tile-get-tensor-shape">
+        <span id="op-cuda-tile-get-tensor-shape"></span>
+        <h3><span class="section-number">8.11.2. </span>cuda_tile.get_tensor_shape<a class="headerlink"
+                href="#cuda-tile-get-tensor-shape" title="Link to this heading">#</a></h3>
+        <p><em>Returns the shape of a tensor view</em></p>
+        <div class="highlight-default notranslate">
+            <div class="highlight">
+                <pre id="codecell136" tabindex="-1"><span></span><span class="n">cuda_tile</span><span class="o">.</span><span class="n">get_tensor_shape</span> <span class="o">%</span><span class="n">src</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell136">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                        height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <title>Copy to clipboard</title>
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                        <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <section id="id377">
+            <h4>Parameters<a class="headerlink" href="#id377" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>src</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="types.html#type-tensor-view"><span class="std std-ref">tensor_view</span></a>) - The
+                        source tensor view. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+            </ul>
+        </section>
+        <section id="id378">
+            <h4>Results<a class="headerlink" href="#id378" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>result</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-variadic"><span class="std std-ref">Variadic</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span
+                                class="std std-ref">tile</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="#type-any"><span
+                                class="std std-ref">any</span></a><span
+                            class="tile-ir-type notranslate">&gt;</span><span
+                            class="tile-ir-type notranslate">&gt;</span>) - The shape of the tensor, each value
+                        representing the size of the corresponding dimension. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+            </ul>
+        </section>
+        <section id="id379">
+            <h4>Description<a class="headerlink" href="#id379" title="Link to this heading">#</a></h4>
+            <p>The <code class="code docutils literal notranslate"><span class="pre">get_tensor_shape</span></code>
+                operation returns the shape of the tensor
+                backing the provided <code
+                    class="code docutils literal notranslate"><span class="pre">tensor_view</span></code>.</p>
+            <p>If the tensor shape sizes do not fit within the provided type, behavior
+                is undefined.</p>
+        </section>
+        <section id="id380">
+            <h4>Constraints<a class="headerlink" href="#id380" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p>The operation is pure and does not perform any memory side effects.</p>
+                </li>
+            </ul>
+        </section>
+    </section>
+    <section id="cuda-tile-load-view-tko">
+        <span id="op-cuda-tile-load-view-tko"></span>
+        <h3><span class="section-number">8.11.3. </span>cuda_tile.load_view_tko<a class="headerlink"
+                href="#cuda-tile-load-view-tko" title="Link to this heading">#</a></h3>
+        <p><em>Load a tile from a tile view</em></p>
+        <div class="highlight-default notranslate">
+            <div class="highlight">
+                <pre id="codecell137" tabindex="0"><span></span><span class="n">cuda_tile</span><span class="o">.</span><span class="n">load_view_tko</span> <span class="o">%</span><span class="n">memory_ordering_semantics</span> <span class="o">%</span><span class="n">memory_scope</span> <span class="o">%</span><span class="n">view</span> <span class="o">%</span><span class="n">index</span> <span class="o">%</span><span class="n">token</span> <span class="o">%</span><span class="n">optimization_hints</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell137">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                        height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <title>Copy to clipboard</title>
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                        <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <section id="id381">
+            <h4>Parameters<a class="headerlink" href="#id381" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>memory_ordering_semantics</strong> (<a
+                            class="tile-ir-type notranslate reference internal"
+                            href="#op-attribute-cuda-tile-load-view-tko-memoryorderingsemantics-attr"><span
+                                class="std std-ref">MemoryOrderingSemantics</span></a>) - The memory ordering semantics
+                        for the load operation. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>memory_scope</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#op-attribute-cuda-tile-load-view-tko-memoryscope-attr"><span
+                                class="std std-ref">MemoryScope</span></a>) - The memory scope for the atomic operation.
+                        <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>view</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-view-type"><span class="std std-ref">view_type</span></a>) - The view from which
+                        the tile will be loaded. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>index</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-variadic"><span class="std std-ref">Variadic</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span
+                                class="std std-ref">tile</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="#type-any"><span
+                                class="std std-ref">any</span></a><span
+                            class="tile-ir-type notranslate">&gt;</span><span
+                            class="tile-ir-type notranslate">&gt;</span>) - The n-dimensional index of the desired
+                        element to load from the view. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>token</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-token"><span class="std std-ref">token</span></a>) - The optional token for the
+                        load operation. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>optimization_hints</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#op-attribute-cuda-tile-load-view-tko-optimizationhints-attr"><span
+                                class="std std-ref">OptimizationHints</span></a>) - Optimization hints for operation
+                        <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+            </ul>
+        </section>
+        <section id="id382">
+            <h4>Results<a class="headerlink" href="#id382" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>tile</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="types.html#type-tile"><span class="std std-ref">tile</span></a>) - The loaded tile.
+                        <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>result_token</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-token"><span class="std std-ref">token</span></a>) - The result token. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+            </ul>
+        </section>
+        <section id="id383">
+            <h4>Description<a class="headerlink" href="#id383" title="Link to this heading">#</a></h4>
+            <p>The <code class="code docutils literal notranslate"><span class="pre">load_view_tko</span></code>
+                operation loads a tile from a tile view.</p>
+            <p>A view is mapping from view-space indices to a particular element in the view, each
+                view type has a defined mapping from view-space indices to tiles produced from elements
+                of the view.</p>
+            <p>For example, the <a class="reference internal" href="types.html#type-partition-view"><span
+                        class="std std-ref">Partition View</span></a> partitions a <a class="reference internal"
+                    href="types.html#type-tensor-view"><span class="std std-ref">Tensor View</span></a> into
+                a grid of equally sized tiles. The view indices one of the partitioned tiles in the grid.</p>
+            <p>For a given view the rank of the indices must match the rank of the view’s index
+                space. The space of valid indices depends on which view is passed to the operation.
+                For example the index space of a <a class="reference internal"
+                    href="types.html#type-partition-view"><span class="std std-ref">Partition View</span></a> is equal
+                to the
+                rank of the partitioned tiles.</p>
+            <p>Out of bounds accesses are handling according to the semantics of the tile view.</p>
+            <p id="op-attribute-cuda-tile-load-view-tko-memoryorderingsemantics-attr">The <code
+                    class="code docutils literal notranslate"><span class="pre">memory_ordering_semantics</span></code>
+                attribute specifies the concurrency assumption between memory accesses in different threads, which
+                controls the synchronization required.
+                For example, <code class="code docutils literal notranslate"><span class="pre">weak</span></code>
+                ordering allows the compiler to assume that there are no concurrent accesses to any accessed location.
+                For more information, refer to the <a class="reference internal"
+                    href="memory_model.html#section-memory-model"><span class="std std-ref">memory model
+                        section</span></a> of the specification.</p>
+            <ul class="simple">
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">weak</span></code> - No
+                        concurrent accesses to the source/destination location.</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">relaxed</span></code> - There
+                        may be concurrent access to the location, but this access does not establish a happens-before
+                        relationship.</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">acquire</span></code> - There
+                        may be concurrent accesses to the location. If this acquire observes a release operation, then
+                        <em>happens before</em> is established.</p>
+                </li>
+            </ul>
+            <p>Note: The following variants are not supported by this operation: <code
+                    class="code docutils literal notranslate"><span class="pre">release</span></code>, <code
+                    class="code docutils literal notranslate"><span class="pre">acq_rel</span></code>.</p>
+            <p id="op-attribute-cuda-tile-load-view-tko-memoryscope-attr">The <code
+                    class="code docutils literal notranslate"><span class="pre">memory_scope</span></code> attribute
+                specifies a communication scope for memory operations.
+                When communicating with other concurrent threads in the system, the scope must be broad enough to
+                encompass all other
+                threads which are participating in the communication, or data races may occur.</p>
+            <ul class="simple">
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">tl_blk</span></code> - There
+                        may be concurrent accesses from within the same tile block.</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">device</span></code> - There
+                        may be concurrent accesses from within the same device (i.e., GPU).</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">sys</span></code> - There may
+                        be concurrent accesses from anywhere within the system (i.e., all devices).</p>
+                </li>
+            </ul>
+            <p id="op-attribute-cuda-tile-load-view-tko-optimizationhints-attr">The <code
+                    class="code docutils literal notranslate"><span class="pre">optimization_hints</span></code>
+                attribute provides architecture-specific compiler hints in the form of nested dictionaries.</p>
+            <p>The hints are specified for each architecture (e.g., <code
+                    class="code docutils literal notranslate"><span class="pre">sm_100</span></code>, <code
+                    class="code docutils literal notranslate"><span class="pre">sm_120</span></code>) and for each
+                architecture the user can specify
+                specific hints for each operation.</p>
+            <ul class="simple">
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">num_cta_in_cga</span></code> -
+                        suggest the number of CTAs in a CGA (which must be the power of 2 less than or equal to 16) for
+                        <a class="reference internal" href="#op-cuda-tile-entry"><span
+                                class="std std-ref">cuda_tile.entry</span></a>.</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">allow_tma</span></code> -
+                        suggest whether to use TMA for <a class="reference internal"
+                            href="#op-cuda-tile-load-view-tko"><span
+                                class="std std-ref">cuda_tile.load_view_tko</span></a> and <a class="reference internal"
+                            href="#op-cuda-tile-store-view-tko"><span
+                                class="std std-ref">cuda_tile.store_view_tko</span></a>.</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">latency</span></code> - latency
+                        hint for <a class="reference internal" href="#op-cuda-tile-load-view-tko"><span
+                                class="std std-ref">cuda_tile.load_view_tko</span></a> and <a class="reference internal"
+                            href="#op-cuda-tile-store-view-tko"><span
+                                class="std std-ref">cuda_tile.store_view_tko</span></a>.</p>
+                </li>
+            </ul>
+            <p>For example they can be annotated as:</p>
+            <div class="highlight-mlir notranslate">
+                <div class="highlight">
+                    <pre id="codecell138" tabindex="-1"><span></span><span class="nf">optimization_hints</span><span class="o">=&lt;</span>
+<span class="w">  </span><span class="n">sm_100</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">num_cta_in_cga</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span>
+<span class="w">  </span><span class="n">sm_120</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">num_cta_in_cga</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">}</span>
+<span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell138">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                            height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <title>Copy to clipboard</title>
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+        <section id="id384">
+            <h4>Constraints<a class="headerlink" href="#id384" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p>The operation must encode variadic operand segment sizes in attributes.</p>
+                </li>
+            </ul>
+        </section>
+        <section id="id385">
+            <h4>Examples<a class="headerlink" href="#id385" title="Link to this heading">#</a></h4>
+            <div class="highlight-mlir notranslate">
+                <div class="highlight">
+                    <pre id="codecell139" tabindex="0"><span></span><span class="nv">%tensor_view </span><span class="o">= </span><span class="nf">make_tensor_view</span><span class="w"> </span><span class="nv">%ptr</span><span class="p">,</span><span class="w"> </span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">8192</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">],</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span>
+<span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span>
+
+<span class="c1">// This example uses the PartitionView on a 8192x128xf32 tensor_view,</span>
+<span class="c1">// dividing the tensor_view in tiles of 64x64.</span>
+
+<span class="nv">%view </span><span class="o">= </span><span class="nf">make_partition_view</span><span class="w"> </span><span class="nv">%tensor_view</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">partition_view</span><span class="o">&lt;</span><span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="n">64x64</span><span class="p">),</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span>
+
+<span class="nv">%c0 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span>
+<span class="nv">%c1 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span>
+
+<span class="c1">// Load a tile at index (0, 0) in the view's index space.</span>
+<span class="c1">// For this PartitionView, this is the rectangular tile such that</span>
+<span class="c1">// X=[0,64) and Y=[0,64), in the coordinates of tiles.</span>
+<span class="nv">%tile0</span><span class="p">,</span><span class="w"> </span><span class="nv">%res_token0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_view_tko</span><span class="w"> </span><span class="n">weak</span><span class="w"> </span><span class="nv">%view</span><span class="p">[</span><span class="nv">%c0</span><span class="p">,</span><span class="w"> </span><span class="nv">%c0</span><span class="p">]</span>
+<span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">partition_view</span><span class="o">&lt;</span><span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="n">64x64</span><span class="p">),</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">64x64xf32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">token</span>
+
+<span class="c1">// Load a tile at index (0, 1) in the view's index space.</span>
+<span class="c1">// For this PartitionView, this is the rectangular tile such that</span>
+<span class="c1">// X=[0,64) and Y=[64,128), in the coordinates of tiles.</span>
+<span class="nv">%tile1</span><span class="p">,</span><span class="w"> </span><span class="nv">%res_token1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_view_tko</span><span class="w"> </span><span class="n">weak</span><span class="w"> </span><span class="nv">%view</span><span class="p">[</span><span class="nv">%c0</span><span class="p">,</span><span class="w"> </span><span class="nv">%c1</span><span class="p">]</span>
+<span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">partition_view</span><span class="o">&lt;</span><span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="n">64x64</span><span class="p">),</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">64x64xf32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">token</span>
+
+<span class="c1">// Same example as above but with memory token as input.</span>
+<span class="nv">%token </span><span class="o">= </span><span class="nf">make_token</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">token</span>
+<span class="nv">%tile2</span><span class="p">,</span><span class="w"> </span><span class="nv">%res_token2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_view_tko</span><span class="w"> </span><span class="n">weak</span><span class="w"> </span><span class="nv">%view</span><span class="p">[</span><span class="nv">%c0</span><span class="p">,</span><span class="w"> </span><span class="nv">%c1</span><span class="p">]</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">%token</span>
+<span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">partition_view</span><span class="o">&lt;</span><span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="n">64x64</span><span class="p">),</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">64x64xf32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">token</span>
+
+<span class="c1">// Loads a tile at the dynamic index (%index, %index) in the view's index space.</span>
+<span class="nv">%tile3</span><span class="p">,</span><span class="w"> </span><span class="nv">%res_token3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_view_tko</span><span class="w"> </span><span class="n">weak</span><span class="w"> </span><span class="nv">%view</span><span class="p">[</span><span class="nv">%index</span><span class="p">,</span><span class="w"> </span><span class="nv">%index</span><span class="p">]</span>
+<span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">partition_view</span><span class="o">&lt;</span><span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="n">64x64</span><span class="p">),</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">64x64xf32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">token</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell139">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                            height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <title>Copy to clipboard</title>
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <p>See <a class="reference internal" href="appendix.html#example-cuda-tile-load-view-tko-0"><span
+                        class="std std-ref">cuda_tile.load_view_tko_0</span></a> for the full example listing.</p>
+        </section>
+    </section>
+    <section id="cuda-tile-make-partition-view">
+        <span id="op-cuda-tile-make-partition-view"></span>
+        <h3><span class="section-number">8.11.4. </span>cuda_tile.make_partition_view<a class="headerlink"
+                href="#cuda-tile-make-partition-view" title="Link to this heading">#</a></h3>
+        <p><em>Create a partition view from a tensor view</em></p>
+        <div class="highlight-default notranslate">
+            <div class="highlight">
+                <pre id="codecell140" tabindex="-1"><span></span><span class="n">cuda_tile</span><span class="o">.</span><span class="n">make_partition_view</span> <span class="o">%</span><span class="n">tensor_view</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell140">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                        height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <title>Copy to clipboard</title>
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                        <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <section id="id386">
+            <h4>Parameters<a class="headerlink" href="#id386" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>tensor_view</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="types.html#type-tensor-view"><span class="std std-ref">tensor_view</span></a>) - The
+                        source tensor view to create a partition view from. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+            </ul>
+        </section>
+        <section id="id387">
+            <h4>Results<a class="headerlink" href="#id387" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>result</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="types.html#type-partition-view"><span class="std std-ref">partition_view</span></a>) -
+                        The created partition view. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+            </ul>
+        </section>
+        <section id="id388">
+            <h4>Description<a class="headerlink" href="#id388" title="Link to this heading">#</a></h4>
+            <p>The <code class="code docutils literal notranslate"><span class="pre">make_partition_view</span></code>
+                operation creates a <a class="tile-ir-type notranslate reference internal"
+                    href="types.html#type-partition-view"><span class="std std-ref">partition_view</span></a> from a
+                <a class="tile-ir-type notranslate reference internal" href="types.html#type-tensor-view"><span
+                        class="std std-ref">tensor_view</span></a>. For more details about partition views see <a
+                    class="reference internal" href="types.html#type-partition-view"><span class="std std-ref">Partition
+                        View</span></a>.
+            </p>
+            <p>The operation uses the type constraints of the input tensor view and the annotated return type
+                to perform the partitioning. The tensor view’s type contains its physical layout in the form
+                of shapes and strides and the partition view containts the logical size of a single tile.</p>
+            <p>The resulting partition view can be loaded from using <a class="reference internal"
+                    href="#op-cuda-tile-load-view-tko"><span class="std std-ref">cuda_tile.load_view_tko</span></a> and
+                stored to using <a class="reference internal" href="#op-cuda-tile-store-view-tko"><span
+                        class="std std-ref">cuda_tile.store_view_tko</span></a>.</p>
+            <p>The view memory options act on the computed index space of the partition view see
+                <a class="reference internal" href="types.html#type-tensor-view"><span class="std std-ref">Tensor
+                        View</span></a> and <a class="reference internal" href="types.html#type-partition-view"><span
+                        class="std std-ref">Partition View</span></a> for detailed semantics.
+            </p>
+        </section>
+        <section id="id389">
+            <h4>Constraints<a class="headerlink" href="#id389" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p>The operation is conditionally speculatablebased on the specific operands and attributes.</p>
+                </li>
+                <li>
+                    <p>The operation may be speculatively executed without side effects.</p>
+                </li>
+                <li>
+                    <p>The operation is pure and does not perform any memory side effects.</p>
+                </li>
+            </ul>
+        </section>
+        <section id="id390">
+            <h4>Examples<a class="headerlink" href="#id390" title="Link to this heading">#</a></h4>
+            <div class="highlight-mlir notranslate">
+                <div class="highlight">
+                    <pre id="codecell141" tabindex="-1"><span></span><span class="nv">%tensor_view0 </span><span class="o">= </span><span class="nf">make_tensor_view</span><span class="w"> </span><span class="nv">%ptr</span><span class="p">,</span><span class="w"> </span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">8192</span><span class="p">,</span><span class="w"> </span><span class="mi">8192</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">],</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">524288</span><span class="p">,</span><span class="mi">64</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x8192x64xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">524288</span><span class="p">,</span><span class="mi">64</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span>
+
+<span class="c1">// Creates a partition with 32-bit-indexed tiles of size (1024x1x32) over</span>
+<span class="c1">// the provided tensor_view.</span>
+<span class="nf">make_partition_view</span><span class="w"> </span><span class="nv">%tensor_view0</span><span class="w"> </span><span class="p">:</span>
+<span class="w">  </span><span class="n">partition_view</span><span class="o">&lt;</span>
+<span class="w">    </span><span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="n">1024x1x32</span><span class="p">),</span>
+<span class="w">    </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x8192x64xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">524288</span><span class="p">,</span><span class="mi">64</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span>
+<span class="w">  </span><span class="o">&gt;</span>
+
+<span class="nv">%s0 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mi">8192</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span>
+<span class="nv">%str0 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mi">524288</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span>
+
+<span class="nv">%tensor_view1 </span><span class="o">= </span><span class="nf">make_tensor_view</span><span class="w"> </span><span class="nv">%ptr</span><span class="p">,</span><span class="w"> </span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="nv">%s0</span><span class="p">,</span><span class="w"> </span><span class="mi">8192</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">],</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="nv">%str0</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span>
+<span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span>?<span class="n">x8192x64xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span>?<span class="p">,</span><span class="mi">64</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span>
+
+<span class="c1">// Creates a partition with 32-bit-indexed tiles of size (1024x1x32) over</span>
+<span class="c1">// the provided tensor_view, with masking. The provided tensor_view has a</span>
+<span class="c1">// dynamically-sized dimension.</span>
+<span class="nf">make_partition_view</span><span class="w"> </span><span class="nv">%tensor_view1</span><span class="w"> </span><span class="p">:</span>
+<span class="w">  </span><span class="n">partition_view</span><span class="o">&lt;</span><span class="n">tensor_view</span><span class="o">&lt;</span>?<span class="n">x8192x64xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span>?<span class="p">,</span><span class="mi">64</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell141">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                            height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <title>Copy to clipboard</title>
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <p>See <a class="reference internal" href="appendix.html#example-cuda-tile-make-partition-view-0"><span
+                        class="std std-ref">cuda_tile.make_partition_view_0</span></a> for the full example listing.</p>
+        </section>
+    </section>
+    <section id="cuda-tile-make-tensor-view">
+        <span id="op-cuda-tile-make-tensor-view"></span>
+        <h3><span class="section-number">8.11.5. </span>cuda_tile.make_tensor_view<a class="headerlink"
+                href="#cuda-tile-make-tensor-view" title="Link to this heading">#</a></h3>
+        <p><em>Create :code:`tensor_view` from a pointer to global memory</em></p>
+        <div class="highlight-default notranslate">
+            <div class="highlight">
+                <pre id="codecell142" tabindex="-1"><span></span><span class="n">cuda_tile</span><span class="o">.</span><span class="n">make_tensor_view</span> <span class="o">%</span><span class="n">base</span> <span class="o">%</span><span class="n">dynamicShape</span> <span class="o">%</span><span class="n">dynamicStrides</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell142">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                        height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <title>Copy to clipboard</title>
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                        <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <section id="id391">
+            <h4>Parameters<a class="headerlink" href="#id391" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>base</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="types.html#type-tile"><span class="std std-ref">tile</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="types.html#type-ptr"><span
+                                class="std std-ref">ptr</span></a><span class="tile-ir-type notranslate">&gt;</span>) -
+                        The scalar base pointer to a portion of global memory. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>dynamicShape</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-variadic"><span class="std std-ref">Variadic</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span
+                                class="std std-ref">tile</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="#type-any"><span
+                                class="std std-ref">any</span></a><span
+                            class="tile-ir-type notranslate">&gt;</span><span
+                            class="tile-ir-type notranslate">&gt;</span>) - The array of values representing the shape
+                        of the view, may be fully dynamic. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>dynamicStrides</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-variadic"><span class="std std-ref">Variadic</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span
+                                class="std std-ref">tile</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="#type-any"><span
+                                class="std std-ref">any</span></a><span
+                            class="tile-ir-type notranslate">&gt;</span><span
+                            class="tile-ir-type notranslate">&gt;</span>) - The array of values representing the strides
+                        of the view, may be fully dynamic. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+            </ul>
+        </section>
+        <section id="id392">
+            <h4>Results<a class="headerlink" href="#id392" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>result</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="types.html#type-tensor-view"><span class="std std-ref">tensor_view</span></a>) - The
+                        constructed tensor_view. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+            </ul>
+        </section>
+        <section id="id393">
+            <h4>Description<a class="headerlink" href="#id393" title="Link to this heading">#</a></h4>
+            <p>The <code class="code docutils literal notranslate"><span class="pre">make_tensor_view</span></code>
+                operation constructs a <code
+                    class="code docutils literal notranslate"><span class="pre">tensor_view</span></code> from a global
+                memory pointer, a dynamic shape and dynamic strides. See <a class="reference internal"
+                    href="types.html#type-tensor-view"><span class="std std-ref">Tensor View</span></a> for more
+                details.</p>
+            <p>The constructor supports taking dynamic arrays for shapes and strides as part of the constructor
+                enabling workloads to take global memory tensors of dynamic shape and strides. If these arguments
+                are static they will be statically reflected in the type of the resulting <code
+                    class="code docutils literal notranslate"><span class="pre">tensor_view</span></code>, if
+                they are dynamic they will appear as <code
+                    class="code docutils literal notranslate"><span class="pre">?</span></code> in the type. See below
+                for concrete examples.</p>
+            <p>If shapes or strides are larger than the <code
+                    class="code docutils literal notranslate"><span class="pre">indexBitwidth</span></code> of the
+                <code class="code docutils literal notranslate"><span class="pre">tensor_view</span></code>, behavior is
+                undefined on the creation of the
+                <code class="code docutils literal notranslate"><span class="pre">tensor_view</span></code>.
+            </p>
+        </section>
+        <section id="id394">
+            <h4>Constraints<a class="headerlink" href="#id394" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p>The operation must encode variadic operand segment sizes in attributes.</p>
+                </li>
+                <li>
+                    <p>The operation is pure and does not perform any memory side effects.</p>
+                </li>
+            </ul>
+        </section>
+        <section id="id395">
+            <h4>Examples<a class="headerlink" href="#id395" title="Link to this heading">#</a></h4>
+            <div class="highlight-mlir notranslate">
+                <div class="highlight">
+                    <pre id="codecell143" tabindex="-1"><span></span><span class="w">  </span><span class="c1">// tensor_view to a scalar tile of f32</span>
+<span class="w">  </span><span class="nv">%a0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">make_tensor_view</span><span class="w"> </span><span class="nv">%base</span><span class="p">,</span>
+<span class="w">      </span><span class="n">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="n">strides</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span>
+
+<span class="w">  </span><span class="c1">// tensor_view to a tile of static shape and strides</span>
+<span class="w">  </span><span class="nv">%a1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">make_tensor_view</span><span class="w"> </span><span class="nv">%base</span><span class="p">,</span>
+<span class="w">      </span><span class="n">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">],</span><span class="w"> </span><span class="n">strides</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span>
+<span class="w">      </span><span class="p">:</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">32x32xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">32</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span>
+
+<span class="nv">%sh0 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mi">32</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span>
+<span class="nv">%sh1 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mi">32</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span>
+<span class="nv">%st0 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mi">32</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span>
+<span class="nv">%st1 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span>
+
+<span class="w">  </span><span class="c1">// tensor_view to a tile with partially dynamic shape and strides</span>
+<span class="w">  </span><span class="c1">// all dynamic values must be of the same type, here tile&lt;i32&gt;</span>
+<span class="w">  </span><span class="nv">%a2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">make_tensor_view</span><span class="w"> </span><span class="nv">%base</span><span class="p">,</span>
+<span class="w">          </span><span class="n">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">%sh0</span><span class="p">,</span><span class="w"> </span><span class="nv">%sh1</span><span class="p">],</span><span class="w"> </span><span class="n">strides</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nv">%st0</span><span class="p">,</span><span class="w"> </span><span class="nv">%st1</span><span class="p">]</span>
+<span class="w">          </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span>?<span class="n">x</span>?<span class="n">xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span>?<span class="p">,</span>?<span class="p">]</span><span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell143">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                            height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <title>Copy to clipboard</title>
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <p>See <a class="reference internal" href="appendix.html#example-cuda-tile-make-tensor-view-0"><span
+                        class="std std-ref">cuda_tile.make_tensor_view_0</span></a> for the full example listing.</p>
+        </section>
+    </section>
+    <section id="cuda-tile-store-view-tko">
+        <span id="op-cuda-tile-store-view-tko"></span>
+        <h3><span class="section-number">8.11.6. </span>cuda_tile.store_view_tko<a class="headerlink"
+                href="#cuda-tile-store-view-tko" title="Link to this heading">#</a></h3>
+        <p><em>Stores a tile into a tile view</em></p>
+        <div class="highlight-default notranslate">
+            <div class="highlight">
+                <pre id="codecell144" tabindex="0"><span></span><span class="n">cuda_tile</span><span class="o">.</span><span class="n">store_view_tko</span> <span class="o">%</span><span class="n">memory_ordering_semantics</span> <span class="o">%</span><span class="n">memory_scope</span> <span class="o">%</span><span class="n">tile</span> <span class="o">%</span><span class="n">view</span> <span class="o">%</span><span class="n">index</span> <span class="o">%</span><span class="n">token</span> <span class="o">%</span><span class="n">optimization_hints</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell144">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                        height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <title>Copy to clipboard</title>
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                        <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <section id="id396">
+            <h4>Parameters<a class="headerlink" href="#id396" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>memory_ordering_semantics</strong> (<a
+                            class="tile-ir-type notranslate reference internal"
+                            href="#op-attribute-cuda-tile-store-view-tko-memoryorderingsemantics-attr"><span
+                                class="std std-ref">MemoryOrderingSemantics</span></a>) - The memory scope for the store
+                        operation. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>memory_scope</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#op-attribute-cuda-tile-store-view-tko-memoryscope-attr"><span
+                                class="std std-ref">MemoryScope</span></a>) - The memory scope for the store operation.
+                        <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>tile</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="types.html#type-tile"><span class="std std-ref">tile</span></a>) - The tile to store.
+                        <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>view</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-view-type"><span class="std std-ref">view_type</span></a>) - The view to store
+                        the tile to. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>index</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-variadic"><span class="std std-ref">Variadic</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="types.html#type-tile"><span
+                                class="std std-ref">tile</span></a><span>&lt;</span><a
+                            class="tile-ir-type notranslate reference internal" href="#type-any"><span
+                                class="std std-ref">any</span></a><span
+                            class="tile-ir-type notranslate">&gt;</span><span
+                            class="tile-ir-type notranslate">&gt;</span>) - The indices of the desired target tile
+                        within the view. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>token</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-token"><span class="std std-ref">token</span></a>) - The optional token for
+                        operation ordering. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+                <li>
+                    <p><strong>optimization_hints</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#op-attribute-cuda-tile-store-view-tko-optimizationhints-attr"><span
+                                class="std std-ref">OptimizationHints</span></a>) - Optimization hints for operation
+                        <span class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+            </ul>
+        </section>
+        <section id="id397">
+            <h4>Results<a class="headerlink" href="#id397" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p><strong>result_token</strong> (<a class="tile-ir-type notranslate reference internal"
+                            href="#type-token"><span class="std std-ref">token</span></a>) - The result token for
+                        synchronization. <span
+                            class="sd-sphinx-override sd-badge sd-outline-success sd-text-success">13.1</span></p>
+                </li>
+            </ul>
+        </section>
+        <section id="id398">
+            <h4>Description<a class="headerlink" href="#id398" title="Link to this heading">#</a></h4>
+            <p>The <code class="code docutils literal notranslate"><span class="pre">store_view_tko</span></code>
+                operation stores a tile to a view indexing into a
+                tile view.</p>
+            <p>A view is mapping from view-space indices to a particular element in the view, each
+                view type has a defined mapping from view-space indices to tiles produced from elements
+                of the view.</p>
+            <p>For example, the <a class="reference internal" href="types.html#type-partition-view"><span
+                        class="std std-ref">Partition View</span></a> partitions a <a class="reference internal"
+                    href="types.html#type-tensor-view"><span class="std std-ref">Tensor View</span></a> into
+                a grid of equally sized tiles. The view indices one of the partitioned tiles in the grid.</p>
+            <p>For a given view the rank of the indices must match the rank of the view’s index
+                space. The space of valid indices depends on which view is passed to the operation.
+                For example the index space of a <a class="reference internal"
+                    href="types.html#type-partition-view"><span class="std std-ref">Partition View</span></a> is equal
+                to the
+                rank of the partitioned tiles.</p>
+            <p>The index space of the view is computed a function of the requested tile
+                size and the shape of the view.</p>
+            <p id="op-attribute-cuda-tile-store-view-tko-memoryorderingsemantics-attr">The <code
+                    class="code docutils literal notranslate"><span class="pre">memory_ordering_semantics</span></code>
+                attribute specifies the concurrency assumption between memory accesses in different threads, which
+                controls the synchronization required.
+                For example, <code class="code docutils literal notranslate"><span class="pre">weak</span></code>
+                ordering allows the compiler to assume that there are no concurrent accesses to any accessed location.
+                For more information, refer to the <a class="reference internal"
+                    href="memory_model.html#section-memory-model"><span class="std std-ref">memory model
+                        section</span></a> of the specification.</p>
+            <ul class="simple">
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">weak</span></code> - No
+                        concurrent accesses to the source/destination location.</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">relaxed</span></code> - There
+                        may be concurrent access to the location, but this access does not establish a happens-before
+                        relationship.</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">release</span></code> - There
+                        may be concurrent access to the location. If this release is observed with an acquire operation,
+                        then <em>happens before</em> is established.</p>
+                </li>
+            </ul>
+            <p>Note: The following variants are not supported by this operation: <code
+                    class="code docutils literal notranslate"><span class="pre">acquire</span></code>, <code
+                    class="code docutils literal notranslate"><span class="pre">acq_rel</span></code>.</p>
+            <p id="op-attribute-cuda-tile-store-view-tko-memoryscope-attr">The <code
+                    class="code docutils literal notranslate"><span class="pre">memory_scope</span></code> attribute
+                specifies a communication scope for memory operations.
+                When communicating with other concurrent threads in the system, the scope must be broad enough to
+                encompass all other
+                threads which are participating in the communication, or data races may occur.</p>
+            <ul class="simple">
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">tl_blk</span></code> - There
+                        may be concurrent accesses from within the same tile block.</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">device</span></code> - There
+                        may be concurrent accesses from within the same device (i.e., GPU).</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">sys</span></code> - There may
+                        be concurrent accesses from anywhere within the system (i.e., all devices).</p>
+                </li>
+            </ul>
+            <p id="op-attribute-cuda-tile-store-view-tko-optimizationhints-attr">The <code
+                    class="code docutils literal notranslate"><span class="pre">optimization_hints</span></code>
+                attribute provides architecture-specific compiler hints in the form of nested dictionaries.</p>
+            <p>The hints are specified for each architecture (e.g., <code
+                    class="code docutils literal notranslate"><span class="pre">sm_100</span></code>, <code
+                    class="code docutils literal notranslate"><span class="pre">sm_120</span></code>) and for each
+                architecture the user can specify
+                specific hints for each operation.</p>
+            <ul class="simple">
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">num_cta_in_cga</span></code> -
+                        suggest the number of CTAs in a CGA (which must be the power of 2 less than or equal to 16) for
+                        <a class="reference internal" href="#op-cuda-tile-entry"><span
+                                class="std std-ref">cuda_tile.entry</span></a>.</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">allow_tma</span></code> -
+                        suggest whether to use TMA for <a class="reference internal"
+                            href="#op-cuda-tile-load-view-tko"><span
+                                class="std std-ref">cuda_tile.load_view_tko</span></a> and <a class="reference internal"
+                            href="#op-cuda-tile-store-view-tko"><span
+                                class="std std-ref">cuda_tile.store_view_tko</span></a>.</p>
+                </li>
+                <li>
+                    <p><code class="code docutils literal notranslate"><span class="pre">latency</span></code> - latency
+                        hint for <a class="reference internal" href="#op-cuda-tile-load-view-tko"><span
+                                class="std std-ref">cuda_tile.load_view_tko</span></a> and <a class="reference internal"
+                            href="#op-cuda-tile-store-view-tko"><span
+                                class="std std-ref">cuda_tile.store_view_tko</span></a>.</p>
+                </li>
+            </ul>
+            <p>For example they can be annotated as:</p>
+            <div class="highlight-mlir notranslate">
+                <div class="highlight">
+                    <pre id="codecell145" tabindex="-1"><span></span><span class="nf">optimization_hints</span><span class="o">=&lt;</span>
+<span class="w">  </span><span class="n">sm_100</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">num_cta_in_cga</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">},</span>
+<span class="w">  </span><span class="n">sm_120</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">num_cta_in_cga</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">}</span>
+<span class="o">&gt;</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell145">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                            height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <title>Copy to clipboard</title>
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+        <section id="id399">
+            <h4>Constraints<a class="headerlink" href="#id399" title="Link to this heading">#</a></h4>
+            <ul class="simple">
+                <li>
+                    <p>The operation must encode variadic operand segment sizes in attributes.</p>
+                </li>
+                <li>
+                    <p>The operation’s result type may be inferred from its operands and attributes.</p>
+                </li>
+            </ul>
+        </section>
+        <section id="id400">
+            <h4>Examples<a class="headerlink" href="#id400" title="Link to this heading">#</a></h4>
+            <div class="highlight-mlir notranslate">
+                <div class="highlight">
+                    <pre id="codecell146" tabindex="0"><span></span><span class="nv">%tensor_view </span><span class="o">= </span><span class="nf">make_tensor_view</span><span class="w"> </span><span class="nv">%ptr</span><span class="p">,</span><span class="w"> </span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">8192</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">],</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="p">:</span>
+<span class="w">  </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span>
+
+<span class="c1">// This example uses the PartitionView on a 8192x128xf32 tensor_view,</span>
+<span class="c1">// dividing the tensor_view in tiles of 64x64.</span>
+<span class="nv">%view </span><span class="o">= </span><span class="nf">make_partition_view</span><span class="w"> </span><span class="nv">%tensor_view</span><span class="w"> </span><span class="p">:</span>
+<span class="w">  </span><span class="n">partition_view</span><span class="o">&lt;</span><span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="n">64x64</span><span class="p">),</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span>
+
+<span class="nv">%c0 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span>
+<span class="nv">%c1 </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span>
+
+<span class="nv">%tile </span><span class="o">= </span><span class="nf">constant</span><span class="w"> </span><span class="n">dense</span><span class="o">&lt;</span><span class="mf">0.0</span><span class="o">&gt;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">64x64xf32</span><span class="o">&gt;</span>
+
+<span class="c1">// Store a tile at index (0, 0) in the view's index space.</span>
+<span class="c1">// For this TilePartitionView, this is the rectangular tile such that</span>
+<span class="c1">// X=[0,64) and Y=[0,64), in the coordinates of tiles.</span>
+<span class="nv">%res_token0 </span><span class="o">= </span><span class="nf">store_view_tko</span><span class="w"> </span><span class="n">weak</span><span class="w"> </span><span class="nv">%tile</span><span class="p">,</span><span class="w"> </span><span class="nv">%view</span><span class="p">[</span><span class="nv">%c0</span><span class="p">,</span><span class="w"> </span><span class="nv">%c0</span><span class="p">]</span>
+<span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">64x64xf32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">partition_view</span><span class="o">&lt;</span><span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="n">64x64</span><span class="p">),</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">token</span>
+
+<span class="c1">// Store a tile at index (0, 1) in the view's index space.</span>
+<span class="c1">// For this PartitionView, this is the rectangular tile such that</span>
+<span class="c1">// X=[0,64) and Y=[64,128), in the coordinates of tiles.</span>
+<span class="nv">%res_token1 </span><span class="o">= </span><span class="nf">store_view_tko</span><span class="w"> </span><span class="n">weak</span><span class="w"> </span><span class="nv">%tile</span><span class="p">,</span><span class="w"> </span><span class="nv">%view</span><span class="p">[</span><span class="nv">%c0</span><span class="p">,</span><span class="w"> </span><span class="nv">%c1</span><span class="p">]</span>
+<span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">64x64xf32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">partition_view</span><span class="o">&lt;</span><span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="n">64x64</span><span class="p">),</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">token</span>
+
+<span class="c1">// Same example as above but with input token.</span>
+<span class="nv">%token </span><span class="o">= </span><span class="nf">make_token</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">token</span>
+<span class="nv">%res_token2 </span><span class="o">= </span><span class="nf">store_view_tko</span><span class="w"> </span><span class="n">weak</span><span class="w"> </span><span class="nv">%tile</span><span class="p">,</span><span class="w"> </span><span class="nv">%view</span><span class="p">[</span><span class="nv">%c0</span><span class="p">,</span><span class="w"> </span><span class="nv">%c1</span><span class="p">]</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">%token</span>
+<span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">tile</span><span class="o">&lt;</span><span class="n">64x64xf32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">partition_view</span><span class="o">&lt;</span><span class="n">tile</span><span class="o">=</span><span class="p">(</span><span class="n">64x64</span><span class="p">),</span><span class="w"> </span><span class="n">tensor_view</span><span class="o">&lt;</span><span class="n">8192x128xf32</span><span class="p">,</span><span class="w"> </span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">token</span>
+</pre><button class="copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#codecell146">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" width="44"
+                            height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <title>Copy to clipboard</title>
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <p>See <a class="reference internal" href="appendix.html#example-cuda-tile-store-view-tko-0"><span
+                        class="std std-ref">cuda_tile.store_view_tko_0</span></a> for the full example listing.</p>
+        </section>
+    </section>
+</section>
