@@ -1,3 +1,4 @@
+pub mod bitwise;
 pub mod conversions;
 pub mod core;
 pub mod data_structures;

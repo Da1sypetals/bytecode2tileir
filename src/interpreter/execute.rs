@@ -69,6 +69,11 @@ impl crate::interpreter::data_structures::interpreter::ExecutionContext<'_> {
             Opcode::Tan => self.execute_tan(op),
             Opcode::TanH => self.execute_tanh(op),
 
+            // Bitwise operations from llm_docs/tileir/bitwise.md (8.9)
+            Opcode::AndI => self.execute_andi(op),
+            Opcode::OrI => self.execute_ori(op),
+            Opcode::XOrI => self.execute_xori(op),
+
             _ => panic!("Opcode {:?} not implemented", op.opcode),
         }
     }
