@@ -545,9 +545,12 @@ fn test_andi_all_zeros() {
     for [i, j] in ndrange(&[4, 8]) {
         if let Tile::I32(result_arr) = &result {
             assert_eq!(
-                result_arr[[i, j]], 0,
+                result_arr[[i, j]],
+                0,
                 "andi all zeros mismatch at [{},{}]: expected 0, got {}",
-                i, j, result_arr[[i, j]]
+                i,
+                j,
+                result_arr[[i, j]]
             );
         }
     }
@@ -599,9 +602,12 @@ fn test_xori_same_input() {
     for [i, j] in ndrange(&[4, 8]) {
         if let Tile::I32(result_arr) = &result {
             assert_eq!(
-                result_arr[[i, j]], 0,
+                result_arr[[i, j]],
+                0,
                 "xori same input mismatch at [{},{}]: expected 0, got {}",
-                i, j, result_arr[[i, j]]
+                i,
+                j,
+                result_arr[[i, j]]
             );
         }
     }
@@ -614,8 +620,10 @@ fn test_xori_same_input() {
 #[test]
 #[should_panic(expected = "AndI requires matching integer types")]
 fn test_andi_type_mismatch() {
-    let lhs = Tile::I32(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i32; 32]).unwrap());
-    let rhs = Tile::I64(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i64; 32]).unwrap());
+    let lhs =
+        Tile::I32(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i32; 32]).unwrap());
+    let rhs =
+        Tile::I64(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i64; 32]).unwrap());
 
     let _ = lhs.andi(&rhs);
 }
@@ -623,8 +631,10 @@ fn test_andi_type_mismatch() {
 #[test]
 #[should_panic(expected = "OrI requires matching integer types")]
 fn test_ori_type_mismatch() {
-    let lhs = Tile::I16(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i16; 32]).unwrap());
-    let rhs = Tile::I32(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i32; 32]).unwrap());
+    let lhs =
+        Tile::I16(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i16; 32]).unwrap());
+    let rhs =
+        Tile::I32(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i32; 32]).unwrap());
 
     let _ = lhs.ori(&rhs);
 }
@@ -632,8 +642,10 @@ fn test_ori_type_mismatch() {
 #[test]
 #[should_panic(expected = "XOrI requires matching integer types")]
 fn test_xori_type_mismatch() {
-    let lhs = Tile::I8(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i8; 32]).unwrap());
-    let rhs = Tile::I64(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i64; 32]).unwrap());
+    let lhs =
+        Tile::I8(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i8; 32]).unwrap());
+    let rhs =
+        Tile::I64(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i64; 32]).unwrap());
 
     let _ = lhs.xori(&rhs);
 }
@@ -641,8 +653,10 @@ fn test_xori_type_mismatch() {
 #[test]
 #[should_panic(expected = "Shape mismatch")]
 fn test_andi_shape_mismatch() {
-    let lhs = Tile::I32(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i32; 32]).unwrap());
-    let rhs = Tile::I32(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[8, 4]), vec![0i32; 32]).unwrap());
+    let lhs =
+        Tile::I32(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i32; 32]).unwrap());
+    let rhs =
+        Tile::I32(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[8, 4]), vec![0i32; 32]).unwrap());
 
     let _ = lhs.andi(&rhs);
 }
@@ -650,8 +664,12 @@ fn test_andi_shape_mismatch() {
 #[test]
 #[should_panic(expected = "Shape mismatch")]
 fn test_ori_shape_mismatch() {
-    let lhs = Tile::I16(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[2, 4, 8]), vec![0i16; 64]).unwrap());
-    let rhs = Tile::I16(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8, 2]), vec![0i16; 64]).unwrap());
+    let lhs = Tile::I16(
+        ndarray::Array::from_shape_vec(ndarray::IxDyn(&[2, 4, 8]), vec![0i16; 64]).unwrap(),
+    );
+    let rhs = Tile::I16(
+        ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8, 2]), vec![0i16; 64]).unwrap(),
+    );
 
     let _ = lhs.ori(&rhs);
 }
@@ -659,8 +677,11 @@ fn test_ori_shape_mismatch() {
 #[test]
 #[should_panic(expected = "Shape mismatch")]
 fn test_xori_shape_mismatch() {
-    let lhs = Tile::I64(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i64; 32]).unwrap());
-    let rhs = Tile::I64(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8, 2]), vec![0i64; 64]).unwrap());
+    let lhs =
+        Tile::I64(ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8]), vec![0i64; 32]).unwrap());
+    let rhs = Tile::I64(
+        ndarray::Array::from_shape_vec(ndarray::IxDyn(&[4, 8, 2]), vec![0i64; 64]).unwrap(),
+    );
 
     let _ = lhs.xori(&rhs);
 }
@@ -676,13 +697,31 @@ fn test_all_bitwise_ops_on_all_integer_types() {
 
     // Test i8
     {
-        let lhs_data: Vec<i8> = vec![0b0011_0011, 0b0101_0101, 0b0000_1111, 0b0000_0000,
-                                      0b0001_0010, 0b0011_0100, -1, 0];
-        let rhs_data: Vec<i8> = vec![0b0101_0101, 0b0011_0011, 0b0000_0000, 0b0000_1111,
-                                      0b0011_0100, 0b0001_0010, 0, -1];
+        let lhs_data: Vec<i8> = vec![
+            0b0011_0011,
+            0b0101_0101,
+            0b0000_1111,
+            0b0000_0000,
+            0b0001_0010,
+            0b0011_0100,
+            -1,
+            0,
+        ];
+        let rhs_data: Vec<i8> = vec![
+            0b0101_0101,
+            0b0011_0011,
+            0b0000_0000,
+            0b0000_1111,
+            0b0011_0100,
+            0b0001_0010,
+            0,
+            -1,
+        ];
 
-        let lhs = Tile::I8(ndarray::Array::from_shape_vec(shape_2d.clone(), lhs_data.clone()).unwrap());
-        let rhs = Tile::I8(ndarray::Array::from_shape_vec(shape_2d.clone(), rhs_data.clone()).unwrap());
+        let lhs =
+            Tile::I8(ndarray::Array::from_shape_vec(shape_2d.clone(), lhs_data.clone()).unwrap());
+        let rhs =
+            Tile::I8(ndarray::Array::from_shape_vec(shape_2d.clone(), rhs_data.clone()).unwrap());
 
         let and_result = lhs.andi(&rhs);
         let or_result = lhs.ori(&rhs);
@@ -694,26 +733,59 @@ fn test_all_bitwise_ops_on_all_integer_types() {
             let expected_xor = lhs_data[i] ^ rhs_data[i];
 
             if let Tile::I8(arr) = &and_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_and, "i8 andi mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_and,
+                    "i8 andi mismatch at index {}",
+                    i
+                );
             }
             if let Tile::I8(arr) = &or_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_or, "i8 ori mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_or,
+                    "i8 ori mismatch at index {}",
+                    i
+                );
             }
             if let Tile::I8(arr) = &xor_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_xor, "i8 xori mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_xor,
+                    "i8 xori mismatch at index {}",
+                    i
+                );
             }
         }
     }
 
     // Test i16
     {
-        let lhs_data: Vec<i16> = vec![0b0011_1100_0011_1100, 0b0101_0101_0101_0101, 0b0000_1111_0000_1111, 0b0000_0000_0000_0000,
-                                      0b0001_0010_0011_0100, 0b0101_0110_0111_1000, -1, 0];
-        let rhs_data: Vec<i16> = vec![0b0101_0101_0101_0101, 0b0011_1100_0011_1100, 0b0000_0000_0000_0000, 0b0000_1111_0000_1111,
-                                      0b0101_0110_0111_1000, 0b0001_0010_0011_0100, 0, -1];
+        let lhs_data: Vec<i16> = vec![
+            0b0011_1100_0011_1100,
+            0b0101_0101_0101_0101,
+            0b0000_1111_0000_1111,
+            0b0000_0000_0000_0000,
+            0b0001_0010_0011_0100,
+            0b0101_0110_0111_1000,
+            -1,
+            0,
+        ];
+        let rhs_data: Vec<i16> = vec![
+            0b0101_0101_0101_0101,
+            0b0011_1100_0011_1100,
+            0b0000_0000_0000_0000,
+            0b0000_1111_0000_1111,
+            0b0101_0110_0111_1000,
+            0b0001_0010_0011_0100,
+            0,
+            -1,
+        ];
 
-        let lhs = Tile::I16(ndarray::Array::from_shape_vec(shape_2d.clone(), lhs_data.clone()).unwrap());
-        let rhs = Tile::I16(ndarray::Array::from_shape_vec(shape_2d.clone(), rhs_data.clone()).unwrap());
+        let lhs =
+            Tile::I16(ndarray::Array::from_shape_vec(shape_2d.clone(), lhs_data.clone()).unwrap());
+        let rhs =
+            Tile::I16(ndarray::Array::from_shape_vec(shape_2d.clone(), rhs_data.clone()).unwrap());
 
         let and_result = lhs.andi(&rhs);
         let or_result = lhs.ori(&rhs);
@@ -725,26 +797,59 @@ fn test_all_bitwise_ops_on_all_integer_types() {
             let expected_xor = lhs_data[i] ^ rhs_data[i];
 
             if let Tile::I16(arr) = &and_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_and, "i16 andi mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_and,
+                    "i16 andi mismatch at index {}",
+                    i
+                );
             }
             if let Tile::I16(arr) = &or_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_or, "i16 ori mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_or,
+                    "i16 ori mismatch at index {}",
+                    i
+                );
             }
             if let Tile::I16(arr) = &xor_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_xor, "i16 xori mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_xor,
+                    "i16 xori mismatch at index {}",
+                    i
+                );
             }
         }
     }
 
     // Test i32
     {
-        let lhs_data: Vec<i32> = vec![-0x66666666, 0x55555555, -1, 0,
-                                      0x12345678, -0x789ABCDF, -0x21524111, -0x35145442];
-        let rhs_data: Vec<i32> = vec![0x55555555, -0x66666666, 0, -1,
-                                      -0x789ABCDF, 0x12345678, -0x35145442, -0x21524111];
+        let lhs_data: Vec<i32> = vec![
+            -0x66666666,
+            0x55555555,
+            -1,
+            0,
+            0x12345678,
+            -0x789ABCDF,
+            -0x21524111,
+            -0x35145442,
+        ];
+        let rhs_data: Vec<i32> = vec![
+            0x55555555,
+            -0x66666666,
+            0,
+            -1,
+            -0x789ABCDF,
+            0x12345678,
+            -0x35145442,
+            -0x21524111,
+        ];
 
-        let lhs = Tile::I32(ndarray::Array::from_shape_vec(shape_2d.clone(), lhs_data.clone()).unwrap());
-        let rhs = Tile::I32(ndarray::Array::from_shape_vec(shape_2d.clone(), rhs_data.clone()).unwrap());
+        let lhs =
+            Tile::I32(ndarray::Array::from_shape_vec(shape_2d.clone(), lhs_data.clone()).unwrap());
+        let rhs =
+            Tile::I32(ndarray::Array::from_shape_vec(shape_2d.clone(), rhs_data.clone()).unwrap());
 
         let and_result = lhs.andi(&rhs);
         let or_result = lhs.ori(&rhs);
@@ -756,26 +861,59 @@ fn test_all_bitwise_ops_on_all_integer_types() {
             let expected_xor = lhs_data[i] ^ rhs_data[i];
 
             if let Tile::I32(arr) = &and_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_and, "i32 andi mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_and,
+                    "i32 andi mismatch at index {}",
+                    i
+                );
             }
             if let Tile::I32(arr) = &or_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_or, "i32 ori mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_or,
+                    "i32 ori mismatch at index {}",
+                    i
+                );
             }
             if let Tile::I32(arr) = &xor_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_xor, "i32 xori mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_xor,
+                    "i32 xori mismatch at index {}",
+                    i
+                );
             }
         }
     }
 
     // Test i64
     {
-        let lhs_data: Vec<i64> = vec![-0x6666666666666666, 0x5555555555555555, -1, 0,
-                                      0x123456789ABCDEF0, 0x0FEDCBA987654321, -0x2152411135014542, 0x3456789ABCDEF012];
-        let rhs_data: Vec<i64> = vec![0x5555555555555555, -0x6666666666666666, 0, -1,
-                                      0x0FEDCBA987654321, 0x123456789ABCDEF0, 0x3456789ABCDEF012, -0x2152411135014542];
+        let lhs_data: Vec<i64> = vec![
+            -0x6666666666666666,
+            0x5555555555555555,
+            -1,
+            0,
+            0x123456789ABCDEF0,
+            0x0FEDCBA987654321,
+            -0x2152411135014542,
+            0x3456789ABCDEF012,
+        ];
+        let rhs_data: Vec<i64> = vec![
+            0x5555555555555555,
+            -0x6666666666666666,
+            0,
+            -1,
+            0x0FEDCBA987654321,
+            0x123456789ABCDEF0,
+            0x3456789ABCDEF012,
+            -0x2152411135014542,
+        ];
 
-        let lhs = Tile::I64(ndarray::Array::from_shape_vec(shape_2d.clone(), lhs_data.clone()).unwrap());
-        let rhs = Tile::I64(ndarray::Array::from_shape_vec(shape_2d.clone(), rhs_data.clone()).unwrap());
+        let lhs =
+            Tile::I64(ndarray::Array::from_shape_vec(shape_2d.clone(), lhs_data.clone()).unwrap());
+        let rhs =
+            Tile::I64(ndarray::Array::from_shape_vec(shape_2d.clone(), rhs_data.clone()).unwrap());
 
         let and_result = lhs.andi(&rhs);
         let or_result = lhs.ori(&rhs);
@@ -787,13 +925,28 @@ fn test_all_bitwise_ops_on_all_integer_types() {
             let expected_xor = lhs_data[i] ^ rhs_data[i];
 
             if let Tile::I64(arr) = &and_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_and, "i64 andi mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_and,
+                    "i64 andi mismatch at index {}",
+                    i
+                );
             }
             if let Tile::I64(arr) = &or_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_or, "i64 ori mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_or,
+                    "i64 ori mismatch at index {}",
+                    i
+                );
             }
             if let Tile::I64(arr) = &xor_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_xor, "i64 xori mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_xor,
+                    "i64 xori mismatch at index {}",
+                    i
+                );
             }
         }
     }
@@ -803,8 +956,10 @@ fn test_all_bitwise_ops_on_all_integer_types() {
         let lhs_data: Vec<bool> = vec![true, false, true, false, true, false, true, false];
         let rhs_data: Vec<bool> = vec![true, true, false, false, true, true, false, false];
 
-        let lhs = Tile::I1(ndarray::Array::from_shape_vec(shape_2d.clone(), lhs_data.clone()).unwrap());
-        let rhs = Tile::I1(ndarray::Array::from_shape_vec(shape_2d.clone(), rhs_data.clone()).unwrap());
+        let lhs =
+            Tile::I1(ndarray::Array::from_shape_vec(shape_2d.clone(), lhs_data.clone()).unwrap());
+        let rhs =
+            Tile::I1(ndarray::Array::from_shape_vec(shape_2d.clone(), rhs_data.clone()).unwrap());
 
         let and_result = lhs.andi(&rhs);
         let or_result = lhs.ori(&rhs);
@@ -816,13 +971,28 @@ fn test_all_bitwise_ops_on_all_integer_types() {
             let expected_xor = lhs_data[i] ^ rhs_data[i];
 
             if let Tile::I1(arr) = &and_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_and, "i1 andi mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_and,
+                    "i1 andi mismatch at index {}",
+                    i
+                );
             }
             if let Tile::I1(arr) = &or_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_or, "i1 ori mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_or,
+                    "i1 ori mismatch at index {}",
+                    i
+                );
             }
             if let Tile::I1(arr) = &xor_result {
-                assert_eq!(arr[[i / 4, i % 4]], expected_xor, "i1 xori mismatch at index {}", i);
+                assert_eq!(
+                    arr[[i / 4, i % 4]],
+                    expected_xor,
+                    "i1 xori mismatch at index {}",
+                    i
+                );
             }
         }
     }

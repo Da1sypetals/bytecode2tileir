@@ -69,6 +69,22 @@ impl crate::interpreter::data_structures::interpreter::ExecutionContext<'_> {
             Opcode::Tan => self.execute_tan(op),
             Opcode::TanH => self.execute_tanh(op),
 
+            // Integer operations from llm_docs/tileir/integer.md (8.8)
+            Opcode::AbsI => self.execute_absi(op),
+            Opcode::AddI => self.execute_addi(op),
+            Opcode::CmpI => self.execute_cmpi(op),
+            Opcode::DivI => self.execute_divi(op),
+            Opcode::MaxI => self.execute_maxi(op),
+            Opcode::MinI => self.execute_mini(op),
+            Opcode::MmaI => self.execute_mmai(op),
+            Opcode::MulI => self.execute_muli(op),
+            Opcode::MulhiI => self.execute_mulhii(op),
+            Opcode::NegI => self.execute_negi(op),
+            Opcode::RemI => self.execute_remi(op),
+            Opcode::ShLI => self.execute_shli(op),
+            Opcode::ShRI => self.execute_shri(op),
+            Opcode::SubI => self.execute_subi(op),
+
             // Bitwise operations from llm_docs/tileir/bitwise.md (8.9)
             Opcode::AndI => self.execute_andi(op),
             Opcode::OrI => self.execute_ori(op),
