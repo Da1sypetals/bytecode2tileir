@@ -1,4 +1,5 @@
 use crate::cuda_tile_ir::arena::IrArena;
+use crate::cuda_tile_ir::consts::ConstPool;
 use crate::cuda_tile_ir::ids::ValueId;
 use crate::interpreter::data_structures::value::Value;
 use std::collections::HashMap;
@@ -19,6 +20,9 @@ pub struct ExecutionContext<'a> {
 
     /// Global memory buffers, keyed by global variable name.
     pub globals: &'a HashMap<String, Value>,
+
+    /// Constant pool for DenseElements attributes.
+    pub consts: &'a ConstPool,
 }
 
 unsafe impl Sync for ExecutionContext<'_> {}
@@ -30,6 +34,7 @@ impl<'a> ExecutionContext<'a> {
         tile_block_id: [u32; 3],
         grid_size: [u32; 3],
         globals: &'a HashMap<String, Value>,
+        consts: &'a ConstPool,
     ) -> Self {
         ExecutionContext {
             arena,
@@ -37,6 +42,7 @@ impl<'a> ExecutionContext<'a> {
             tile_block_id,
             grid_size,
             globals,
+            consts,
         }
     }
 
@@ -73,14 +79,18 @@ pub struct Interpreter {
 
     /// Global memory buffers, keyed by global variable name.
     pub(crate) globals: HashMap<String, Value>,
+
+    /// Constant pool for DenseElements attributes.
+    pub(crate) consts: ConstPool,
 }
 
 impl Interpreter {
-    /// Create a new interpreter with the given IR arena.
-    pub fn new(arena: IrArena) -> Self {
+    /// Create a new interpreter with the given IR arena and constant pool.
+    pub fn new(arena: IrArena, consts: ConstPool) -> Self {
         Interpreter {
             arena,
             globals: HashMap::new(),
+            consts,
         }
     }
 

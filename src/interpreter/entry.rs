@@ -25,7 +25,7 @@ impl Interpreter {
             keep_const_refs: true,
         };
         let module = decode_module(&data, &opts).expect("Failed to decode bytecode module");
-        Interpreter::new(module.arena)
+        Interpreter::new(module.arena, module.consts)
     }
 
     pub fn execute(&mut self, args: Vec<Value>, grid_size: [usize; 3]) {
@@ -40,6 +40,7 @@ impl Interpreter {
                 [ix, iy, iz],
                 grid_size.map(|x| x as u32),
                 &self.globals,
+                &self.consts,
             );
 
             // Iterate through each block in the region
