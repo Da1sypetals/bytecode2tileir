@@ -43,7 +43,7 @@ fn test_matmul_1() {
 
     let a = rand_2d(m, k);
     let b = rand_2d(k, n);
-    let c = Array2::<f32>::zeros([m, n]);
+    let c = Array2::from_elem([m, n], 0.0_f16);
 
     let args = KernelArgv::new()
         .and(a.as_ptr() as *mut u8)

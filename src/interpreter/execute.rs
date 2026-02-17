@@ -94,7 +94,7 @@ impl ExecutionContext<'_> {
             Opcode::XOrI => self.execute_xori(op),
 
             // Miscellaneous operations from llm_docs/tileir/misc.md (8.10)
-            Opcode::Assume => println!("Omitted: {:?} @ {:?}", op.opcode, op.loc),
+            Opcode::Assume | Opcode::Print => println!("Omitted: {:?} @ {:?}", op.opcode, op.loc),
 
             _ => panic!("Opcode {:?} not implemented", op.opcode),
         }
