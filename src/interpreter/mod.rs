@@ -2,6 +2,7 @@ pub mod args;
 pub mod bitwise;
 pub mod conversions;
 pub mod core;
+pub mod ctrl_flow;
 pub mod data_structures;
 pub mod entry;
 pub mod execute;

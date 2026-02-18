@@ -49,3 +49,5 @@ We EXPLICITLY do not mind (or even encourage if unsafe does the job better) usin
 The typical style is implement tile associated method in float.rs, and call those methods in execute_xxx methods. Do not put heavy logic or computation in execute_xxx methods. You should refer to existing implementations for this.
 
 It is PROHIBITED to first create a `Vec` then construct `ndarray` Array with it. Instead you should create `ndarray` Array in the first place and update arrays with indexing.
+
+Add dependencies via `cargo add`, NOT editing `Cargo.toml` directly. This way the newest version is automatically added.

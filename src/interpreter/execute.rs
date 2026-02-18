@@ -1,10 +1,12 @@
 // Operation execution for TileIR interpreter.
 
-use std::collections::BTreeMap;
-
 use crate::cuda_tile_ir::Opcode;
 use crate::cuda_tile_ir::ids::OpId;
 use crate::interpreter::data_structures::interpreter::ExecutionContext;
+use log::info;
+use log::trace;
+use log::warn;
+use std::collections::BTreeMap;
 
 impl ExecutionContext<'_> {
     pub fn execute_op(&mut self, op_id: OpId) {
@@ -38,9 +40,19 @@ impl ExecutionContext<'_> {
             Opcode::PtrToPtr => self.execute_ptr_to_ptr(op),
             Opcode::TruncI => self.execute_trunci(op),
 
+            // Control flow operations from llm_docs/tileir/ctrl-flow.md (8.5)
+            Opcode::Assert => self.execute_assert(op),
+            Opcode::If => self.execute_if(op),
+            Opcode::For => self.execute_for(op),
+            Opcode::Loop => self.execute_loop(op),
+            Opcode::Return => {
+                // Avoid collapse
+                info!("Return encountered, exiting function");
+            }
+
             // Memory operations from llm_docs/tileir/memory.md (8.6)
             Opcode::MakeToken | Opcode::JoinTokens => {
-                println!("Omitted: {:?} @ {:?}", op.opcode, op.loc)
+                warn!("Omitted: {:?} @ {:?}", op.opcode, op.loc)
             }
             Opcode::LoadPtrTko => self.execute_load_ptr_tko(op),
             Opcode::StorePtrTko => self.execute_store_ptr_tko(op),
@@ -97,7 +109,7 @@ impl ExecutionContext<'_> {
 
             // Miscellaneous operations from llm_docs/tileir/misc.md (8.10)
             Opcode::Assume => self.execute_assume(op),
-            Opcode::Print => println!("Omitted: {:?} @ {:?}", op.opcode, op.loc),
+            Opcode::Print => warn!("Omitted: {:?} @ {:?}", op.opcode, op.loc),
 
             // View operations from llm_docs/tileir/views.md (8.11)
             Opcode::GetIndexSpaceShape => self.execute_get_index_space_shape(op),
@@ -111,7 +123,7 @@ impl ExecutionContext<'_> {
             _ => {
                 // Sort the keys (SSA ids)
                 for (k, v) in self.values.iter().collect::<BTreeMap<_, _>>() {
-                    println!("%{k}: {v:?}")
+                    trace!("%{k}: {v:?}")
                 }
 
                 panic!("Opcode {:?} not implemented", op.opcode)

@@ -3,6 +3,7 @@ use crate::interpreter::data_structures::{
     tensor_view::{PartitionView, TensorView},
     tile::Tile,
 };
+use log::info;
 use rand::{rngs::StdRng, RngExt};
 use rand::{Rng, SeedableRng};
 
@@ -59,13 +60,13 @@ fn test_tile_size_1024x1024() {
 
 #[test]
 fn test_large_scale_10000x10000_f32_full_grid() {
-    println!("Starting large scale test: 16384x16384 f32 matrix with random access");
+    info!("Starting large scale test: 16384x16384 f32 matrix with random access");
 
     let size = 16384;
     let tile_size = 64;
     let buffer_size = size * size * 4;
 
-    println!("Allocating {} MB buffer...", buffer_size / (1024 * 1024));
+    info!("Allocating {} MB buffer...", buffer_size / (1024 * 1024));
     let mut buffer = vec![0u8; buffer_size];
     let ptr = buffer.as_mut_ptr();
 
@@ -85,7 +86,7 @@ fn test_large_scale_10000x10000_f32_full_grid() {
 
     let index_space = partition.index_space_shape();
     let num_tiles = index_space[0] * index_space[1];
-    println!("Grid: {:?}, Total tiles: {}", index_space, num_tiles);
+    info!("Grid: {:?}, Total tiles: {}", index_space, num_tiles);
 
     let mut rng = StdRng::seed_from_u64(9999);
 
@@ -134,7 +135,7 @@ fn test_large_scale_10000x10000_f32_full_grid() {
             }
         });
 
-    println!("Large scale test completed: verified 20 tiles x 4096 elements = 81920 elements");
+    info!("Large scale test completed: verified 20 tiles x 4096 elements = 81920 elements");
 }
 
 #[test]
@@ -189,12 +190,12 @@ fn test_large_scale_100000_element_1d_all_types() {
         assert_eq!(loaded.get_scalar(&[789]), tile.get_scalar(&[789]));
     }
 
-    println!("All types tested with 100000 elements");
+    info!("All types tested with 100000 elements");
 }
 
 #[test]
 fn test_large_scale_3d_tensor() {
-    println!("Testing 3D tensor: 512x512x512 with random access");
+    info!("Testing 3D tensor: 512x512x512 with random access");
 
     let size = 512;
     let tile_size = 32;
@@ -269,12 +270,12 @@ fn test_large_scale_3d_tensor() {
             }
         });
 
-    println!("3D tensor test completed: verified 20 tiles x 32768 elements = 655360 elements");
+    info!("3D tensor test completed: verified 20 tiles x 32768 elements = 655360 elements");
 }
 
 #[test]
 fn test_large_scale_4d_tensor() {
-    println!("Testing 4D tensor: 512x512x256x128 with random access");
+    info!("Testing 4D tensor: 512x512x256x128 with random access");
 
     let buffer_size = 512 * 512 * 256 * 128 * 4;
     let mut buffer = vec![0u8; buffer_size];
@@ -350,12 +351,12 @@ fn test_large_scale_4d_tensor() {
             }
         });
 
-    println!("4D tensor test completed: verified 25 tiles x 131072 elements = 3276800 elements");
+    info!("4D tensor test completed: verified 25 tiles x 131072 elements = 3276800 elements");
 }
 
 #[test]
 fn test_memory_stress_512mb_random_ops() {
-    println!("Memory stress test: 512MB buffer, random operations with RNG");
+    info!("Memory stress test: 512MB buffer, random operations with RNG");
 
     let buffer_size = 512 * 1024 * 1024; // 512 MB
     let mut buffer = vec![0u8; buffer_size];
@@ -374,7 +375,7 @@ fn test_memory_stress_512mb_random_ops() {
     );
 
     let index_space = partition.index_space_shape();
-    println!("Index space: {:?}", index_space);
+    info!("Index space: {:?}", index_space);
 
     let mut rng = StdRng::seed_from_u64(55555);
 
@@ -397,9 +398,9 @@ fn test_memory_stress_512mb_random_ops() {
         }
 
         if op % 1000 == 0 {
-            println!("Completed {} operations", op);
+            info!("Completed {} operations", op);
         }
     }
 
-    println!("Memory stress test completed successfully");
+    info!("Memory stress test completed successfully");
 }

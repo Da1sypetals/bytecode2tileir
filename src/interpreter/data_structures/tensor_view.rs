@@ -1,5 +1,7 @@
 use crate::interpreter::data_structures::elem_type::{ElemType, Scalar};
 use crate::interpreter::data_structures::tile::Tile;
+use log::debug;
+use log::trace;
 
 /// TensorView: A structured pointer to tensor data in memory.
 /// Does NOT own data - holds pointer + shape + stride metadata.
@@ -199,6 +201,8 @@ impl PartitionView {
     ///
     /// If masked and a position is out of bounds, uses padding_value.
     pub fn load_tile(&self, grid_indices: &[i64]) -> Tile {
+        debug!("PartitionView::load_tile: grid_indices = {:?}", grid_indices);
+        debug!("PartitionView::load_tile: tile_shape = {:?}", self.tile_shape);
         assert_eq!(
             grid_indices.len(),
             self.tile_shape.len(),
@@ -224,6 +228,11 @@ impl PartitionView {
                 let view_dim = self.dim_map[tile_dim] as usize;
                 view_pos[view_dim] =
                     grid_indices[tile_dim] * self.tile_shape[tile_dim] as i64 + tile_idx;
+            }
+
+            // Debug: print view_pos on first iteration
+            if tile_indices.iter().all(|&x| x == 0) {
+                trace!("PartitionView::load_tile: tile_indices = {:?}, view_pos = {:?}", tile_indices, view_pos);
             }
 
             // Check if masked and out of bounds

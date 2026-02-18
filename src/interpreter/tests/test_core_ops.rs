@@ -2,6 +2,7 @@ use crate::interpreter::data_structures::{
     elem_type::{ElemType, Scalar},
     tile::Tile,
 };
+use log::info;
 use ndrange::ndrange;
 use rand::{RngExt, SeedableRng};
 
@@ -315,7 +316,7 @@ fn test_cat() {
             // NOTE: tile2_reshaped is Not permuted
             tile2_reshaped.get_scalar(&[ia, ib, id, ic])
         );
-        println!("({ia}, {ib}, {ic}, {id}) test passed")
+        info!("({}, {}, {}, {}) test passed", ia, ib, ic, id)
     }
 }
 

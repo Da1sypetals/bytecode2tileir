@@ -4,6 +4,8 @@ use crate::interpreter::data_structures::{
 };
 use indicatif::ParallelProgressIterator;
 use itertools::Itertools;
+use log::debug;
+use log::info;
 use rand::{rngs::StdRng, seq::SliceRandom, RngExt, SeedableRng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
@@ -324,7 +326,7 @@ fn test_dim_map_2d_transpose() {
     assert_eq!(actual, Scalar::F16(123.0), "Mismatch at tile [1, 0]");
     let actual = tile.get_scalar(&[1, 1]);
     assert_eq!(actual, Scalar::F16(143.0), "Mismatch at tile [1, 1]");
-    println!("2D transpose test OK!!!!")
+    info!("2D transpose test OK")
 }
 
 // ============================================================================
@@ -640,9 +642,9 @@ fn test_dim_map_4d_partial_transpose_random() {
     let mut rng = rand::rng();
     let mut dim_map = vec![0i32, 1, 2, 3];
     dim_map.shuffle(&mut rng);
-    println!("dim_map: {:?}", dim_map);
-    println!("tensor_shape: {:?}", tensor_shape);
-    println!("tile_shape: {:?}", tile_shape);
+    debug!("dim_map: {:?}", dim_map);
+    debug!("tensor_shape: {:?}", tensor_shape);
+    debug!("tile_shape: {:?}", tile_shape);
 
     // Validate: tile_size <= tensor_size (considering dim_map)
     let valid = tile_shape.iter().enumerate().all(|(tile_dim, &t)| {
@@ -650,19 +652,17 @@ fn test_dim_map_4d_partial_transpose_random() {
         t as i64 <= tensor_shape[tensor_dim]
     });
     if !valid {
-        println!(
+        debug!(
             "SKIP: tile_shape {:?} exceeds mapped tensor_shape {:?} with dim_map {:?}",
             tile_shape, tensor_shape, dim_map
         );
-        println!();
         for i in 0..4 {
             // Print mapped tensor shape and tile shape, aligned
-            println!(
+            debug!(
                 "dim {:>2} : tensor_shape = {:>4}, tile_shape = {:>4}",
                 i, tensor_shape[dim_map[i] as usize], tile_shape[i]
             );
         }
-        println!();
         return;
     }
     let partition = PartitionView::new(
@@ -678,7 +678,7 @@ fn test_dim_map_4d_partial_transpose_random() {
     // Test multiple random tiles
     for test_iter in 0..10 {
         let grid_pos: Vec<i64> = grid_shape.iter().map(|&g| rng.random_range(0..g)).collect();
-        println!("Test {}: grid_pos={:?}", test_iter, grid_pos);
+        debug!("Test {}: grid_pos={:?}", test_iter, grid_pos);
 
         let tile = partition.load_tile(&grid_pos);
 
@@ -712,7 +712,7 @@ fn test_dim_map_4d_partial_transpose_random() {
 
 #[test]
 fn test_partition_view_3d_random_tile_access_large() {
-    println!("3D random access: 256x256x128 with 16x16x8 tiles");
+    info!("3D random access: 256x256x128 with 16x16x8 tiles");
 
     let shape = vec![256i64, 256, 128];
     let tile_shape = vec![16i32, 16, 8];
@@ -751,12 +751,12 @@ fn test_partition_view_3d_random_tile_access_large() {
             }
         }
     }
-    println!("3D random access test completed: verified 20 tiles");
+    info!("3D random access test completed: verified 20 tiles");
 }
 
 #[test]
 fn test_partition_view_3d_irregular_shape_large() {
-    println!("3D irregular shape: 255x255x127 with 16x16x8 tiles");
+    info!("3D irregular shape: 255x255x127 with 16x16x8 tiles");
 
     let shape = vec![255i64, 255, 127];
     let tile_shape = vec![16i32, 16, 8];
@@ -816,7 +816,7 @@ fn test_partition_view_3d_irregular_shape_large() {
                 }
             }
         });
-    println!("3D irregular shape test completed: verified 25 tiles");
+    info!("3D irregular shape test completed: verified 25 tiles");
 }
 
 #[test]
@@ -826,7 +826,7 @@ fn test_partition_view_3d_padding_border_definite() {
     let mut tensor = TestTensor::new(shape.clone(), ElemType::I32);
     tensor.fill_arange();
 
-    println!(
+    debug!(
         "3D border test: shape: {:?}, tile_shape: {:?}",
         shape, tile_shape
     );
@@ -893,17 +893,17 @@ fn test_partition_view_3d_padding_border_definite() {
                 }
             }
         }
-        println!(
+        debug!(
             "Position {} at {:?}: {} in-bounds, {} padding",
             idx, grid_pos, in_bounds_count, padding_count
         );
     }
-    println!("3D padding border test completed: verified 15 edge tiles");
+    info!("3D padding border test completed: verified 15 edge tiles");
 }
 
 #[test]
 fn test_partition_view_3d_random_interior_access() {
-    println!("3D random interior access: 256x256x128 with 16x16x8 tiles");
+    info!("3D random interior access: 256x256x128 with 16x16x8 tiles");
 
     let shape = vec![256i64, 256, 128];
     let tile_shape = vec![16i32, 16, 8];
@@ -940,12 +940,12 @@ fn test_partition_view_3d_random_interior_access() {
             }
         }
     }
-    println!("3D random interior access completed: verified 30 tiles");
+    info!("3D random interior access completed: verified 30 tiles");
 }
 
 #[test]
 fn test_partition_view_4d_random_interior_access() {
-    println!("4D random interior access: 128x128x64x32 with 8x8x4x2 tiles");
+    info!("4D random interior access: 128x128x64x32 with 8x8x4x2 tiles");
 
     let shape = vec![128i64, 128, 64, 32];
     let tile_shape = vec![8i32, 8, 4, 2];
@@ -989,12 +989,12 @@ fn test_partition_view_4d_random_interior_access() {
             }
         }
     });
-    println!("4D random interior access completed: verified 20 tiles");
+    info!("4D random interior access completed: verified 20 tiles");
 }
 
 #[test]
 fn test_partition_view_3d_padding_custom_negative() {
-    println!("3D custom negative padding: 256x256x128 with 16x16x8 tiles (padding=-999999)");
+    info!("3D custom negative padding: 256x256x128 with 16x16x8 tiles (padding=-999999)");
 
     let shape = vec![256i64, 256, 128];
     let tile_shape = vec![16i32, 16, 8];
@@ -1084,12 +1084,12 @@ fn test_partition_view_3d_padding_custom_negative() {
                 }
             }
         });
-    println!("3D custom negative padding completed: verified 25 edge tiles");
+    info!("3D custom negative padding completed: verified 25 edge tiles");
 }
 
 #[test]
 fn test_partition_view_3d_padding_custom_positive() {
-    println!("3D custom positive padding: 250x250x125 with 16x16x8 tiles (padding=777777)");
+    info!("3D custom positive padding: 250x250x125 with 16x16x8 tiles (padding=777777)");
 
     let shape = vec![250i64, 250, 125];
     let tile_shape = vec![16i32, 16, 8];
@@ -1151,12 +1151,12 @@ fn test_partition_view_3d_padding_custom_positive() {
             }
         }
     });
-    println!("3D custom positive padding completed: verified 18 edge tiles");
+    info!("3D custom positive padding completed: verified 18 edge tiles");
 }
 
 #[test]
 fn test_partition_view_3d_padding_all_edges() {
-    println!("3D padding all edge combinations: 256x256x128 with 16x16x8 tiles");
+    info!("3D padding all edge combinations: 256x256x128 with 16x16x8 tiles");
 
     let shape = vec![256i64, 256, 128];
     let strides = vec![64 * 32, 511, 1];
@@ -1222,12 +1222,12 @@ fn test_partition_view_3d_padding_all_edges() {
         }
     });
 
-    println!("3D padding all edges completed: verified 20 edge combination tiles");
+    info!("3D padding all edges completed: verified 20 edge combination tiles");
 }
 
 #[test]
 fn test_partition_view_4d_irregular_shape() {
-    println!("4D irregular shape: 128x127x64x33 with 8x8x4x2 tiles");
+    info!("4D irregular shape: 128x127x64x33 with 8x8x4x2 tiles");
 
     let shape = vec![128i64, 127, 64, 33];
     let strides = vec![127 * 64 * 33, 64 * 33, 131, 1];
@@ -1282,12 +1282,12 @@ fn test_partition_view_4d_irregular_shape() {
         }
     });
 
-    println!("4D irregular shape completed: verified 25 tiles");
+    info!("4D irregular shape completed: verified 25 tiles");
 }
 
 #[test]
 fn test_partition_view_5d_random_access() {
-    println!("5D random access: 128x64x64x32x16 with 4x4x2x1x1 tiles");
+    info!("5D random access: 128x64x64x32x16 with 4x4x2x1x1 tiles");
 
     let shape = vec![128i64, 64, 64, 32, 16];
     let tile_shape = vec![4i32, 4, 2, 1, 1];
@@ -1338,12 +1338,12 @@ fn test_partition_view_5d_random_access() {
         }
     });
 
-    println!("5D random access completed: verified 20 tiles x 32 elements");
+    info!("5D random access completed: verified 20 tiles x 32 elements");
 }
 
 #[test]
 fn test_partition_view_5d_irregular_shape() {
-    println!("5D irregular shape: 127x63x61x31x15 with 8x4x4x2x1 tiles");
+    info!("5D irregular shape: 127x63x61x31x15 with 8x4x4x2x1 tiles");
 
     let shape = vec![127i64, 63, 61, 31, 15];
     let tile_shape = vec![8i32, 4, 4, 2, 1];
@@ -1402,12 +1402,12 @@ fn test_partition_view_5d_irregular_shape() {
         }
     });
 
-    println!("5D irregular shape completed: verified 25 tiles");
+    info!("5D irregular shape completed: verified 25 tiles");
 }
 
 #[test]
 fn test_partition_view_3d_custom_padding_all_types() {
-    println!("3D custom padding for all types: 250x250x125 with 16x16x8 tiles");
+    info!("3D custom padding for all types: 250x250x125 with 16x16x8 tiles");
 
     let shape = vec![250i64, 250, 125];
     let tile_shape = vec![16i32, 16, 8];
@@ -1463,12 +1463,12 @@ fn test_partition_view_3d_custom_padding_all_types() {
             }
         });
 
-    println!("3D custom padding all types completed: verified 8 types x 12 edge tiles");
+    info!("3D custom padding all types completed: verified 8 types x 12 edge tiles");
 }
 
 #[test]
 fn test_partition_view_4d_padding_all_edges_definite() {
-    println!("4D padding all edges: 128x128x64x127 with 16x16x8x4 tiles");
+    info!("4D padding all edges: 128x128x64x127 with 16x16x8x4 tiles");
 
     let shape = vec![128i64, 128, 64, 127];
     let tile_shape = vec![16i32, 16, 8, 4];
@@ -1542,12 +1542,12 @@ fn test_partition_view_4d_padding_all_edges_definite() {
         }
     });
 
-    println!("4D padding all edges completed: verified 25 definite edge tiles");
+    info!("4D padding all edges completed: verified 25 definite edge tiles");
 }
 
 #[test]
 fn test_partition_view_5d_padding_corners_definite() {
-    println!("5D padding corners: 64x65x32x17x9 with 4x4x2x1x1 tiles");
+    info!("5D padding corners: 64x65x32x17x9 with 4x4x2x1x1 tiles");
 
     let shape = vec![64i64, 65, 32, 17, 9];
     let tile_shape = vec![8, 8, 2, 4, 4];
@@ -1626,12 +1626,12 @@ fn test_partition_view_5d_padding_corners_definite() {
         }
     });
 
-    println!("5D padding corners completed: verified 30 hypercube corner tiles");
+    info!("5D padding corners completed: verified 30 hypercube corner tiles");
 }
 
 #[test]
 fn test_partition_view_3d_strided_random() {
-    println!("3D strided random: 256x256x128 with NON-CONTIGUOUS strides, 16x16x8 tiles");
+    info!("3D strided random: 256x256x128 with NON-CONTIGUOUS strides, 16x16x8 tiles");
 
     let shape = vec![256i64, 256, 128];
     // Non-contiguous strides with gaps
@@ -1686,12 +1686,12 @@ fn test_partition_view_3d_strided_random() {
             }
         });
 
-    println!("3D strided random completed: verified 15 tiles with non-contiguous strides");
+    info!("3D strided random completed: verified 15 tiles with non-contiguous strides");
 }
 
 #[test]
 fn test_partition_view_4d_all_types_random() {
-    println!("4D all types random: 128x128x64x16 with 8x8x4x1 tiles");
+    info!("4D all types random: 128x128x64x16 with 8x8x4x1 tiles");
 
     let shape = vec![128i64, 128, 64, 16];
     let tile_shape = vec![8i32, 8, 4, 1];
@@ -1736,12 +1736,12 @@ fn test_partition_view_4d_all_types_random() {
         }
     });
 
-    println!("4D all types random completed: verified 9 types x 10 random tiles");
+    info!("4D all types random completed: verified 9 types x 10 random tiles");
 }
 
 #[test]
 fn test_partition_view_4d_custom_padding_per_type() {
-    println!("4D custom padding per type: 250x250x125x250 with 16x16x8x4 tiles");
+    info!("4D custom padding per type: 250x250x125x250 with 16x16x8x4 tiles");
 
     let shape = vec![250i64, 250, 125, 250];
     let tile_shape = vec![16i32, 16, 8, 4];
@@ -1792,5 +1792,5 @@ fn test_partition_view_4d_custom_padding_per_type() {
             }
         });
 
-    println!("4D custom padding per type completed: verified 4 types x 10 edge tiles");
+    info!("4D custom padding per type completed: verified 4 types x 10 edge tiles");
 }

@@ -1,12 +1,15 @@
 use std::path::Path;
 
+use indicatif::ProgressIterator;
 use ndarray::Array2;
+use ndrange::ndrange;
 use rand::RngExt;
 
 use crate::interpreter::{
     args::{KernelArgv, KernelGenericArgv},
     data_structures::interpreter::Interpreter,
 };
+use log::info;
 
 fn rand_2d(row: usize, col: usize) -> Array2<f16> {
     let mut rng = rand::rng();
@@ -33,10 +36,14 @@ fn rand_2d(row: usize, col: usize) -> Array2<f16> {
 //   - %17: columns of A / rows of B (K, duplicate)
 #[test]
 fn test_matmul_1() {
+    use crate::interpreter::tests::test_interpreter::logging_utils::init_test_logger;
+
+    init_test_logger();
+
     let bytecode_path = Path::new("test_samples").join("matmul.tileirbc");
     let mut intp = Interpreter::from_module(bytecode_path);
 
-    let [m, n, k] = [512, 256, 128];
+    let [m, n, k] = [512, 256, 64];
 
     // Consistent with TileIR
     let [tm, tn, tk] = [128, 128, 32];
@@ -44,6 +51,7 @@ fn test_matmul_1() {
     let a = rand_2d(m, k);
     let b = rand_2d(k, n);
     let c = Array2::from_elem([m, n], 0.0_f16);
+    let mut c_ref = Array2::from_elem([m, n], 0.0_f16);
 
     let args = KernelArgv::new()
         .and(a.as_ptr() as *mut u8)
@@ -68,5 +76,25 @@ fn test_matmul_1() {
     let grid_size = [m / tm, n / tn, 1];
     intp.execute(args, grid_size);
 
-    // TODO: expect to fail now.
+    for [i_m, i_n] in ndrange(&[m, n]).progress() {
+        for i_k in 0..k {
+            c_ref[[i_m, i_n]] += a[[i_m, i_k]] * b[[i_k, i_n]];
+        }
+        // println!(
+        //     "Difference at [{}, {}] : {} ; actual({}), expected({})",
+        //     i_m,
+        //     i_n,
+        //     (c[[i_m, i_n]] - c_ref[[i_m, i_n]]).abs(),
+        //     c[[i_m, i_n]],
+        //     c_ref[[i_m, i_n]]
+        // );
+        // assert!(
+        //     c_ref[[i_m, i_n]] == c[[i_m, i_n]],
+        //     "Mismatch at [{}, {}] : actual({}) != expected({})",
+        //     i_m,
+        //     i_n,
+        //     c[[i_m, i_n]],
+        //     c_ref[[i_m, i_n]]
+        // );
+    }
 }

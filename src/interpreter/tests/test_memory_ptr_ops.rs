@@ -1,5 +1,6 @@
 use crate::interpreter::data_structures::elem_type::{ElemType, Scalar};
 use crate::interpreter::data_structures::tile::Tile;
+use log::debug;
 use ndrange::ndrange;
 use rand::{Rng, SeedableRng};
 use rand::{RngExt, rngs::StdRng};
@@ -129,7 +130,7 @@ fn test_load_i32_masked_4d() {
                     i, j, k, l, expected, v
                 );
 
-                println!("Masked: {is_masked}, value: expected {expected} vs actual {v}");
+                debug!("Masked: {}, value: expected {} vs actual {}", is_masked, expected, v);
             }
             _ => panic!("Expected I32 at [{}, {}, {}, {}]", i, j, k, l),
         }
@@ -532,7 +533,7 @@ fn test_store_i32_masked_4d() {
             0xFFFFFFFFu32 as i32
         };
         let actual = unsafe { *((ptr as *mut i32).offset(idx as isize)) };
-        println!(
+        debug!(
             "idx={}, expected={}, actual={}, masked={}",
             idx, expected, actual, is_masked
         );

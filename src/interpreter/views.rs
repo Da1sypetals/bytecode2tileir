@@ -13,6 +13,7 @@ use crate::interpreter::data_structures::tensor_view::{PartitionView, TensorView
 use crate::interpreter::data_structures::tile::Tile;
 use crate::interpreter::data_structures::value::Value;
 use crate::interpreter::type_conversion;
+use log::debug;
 
 impl ExecutionContext<'_> {
     // =========================================================================
@@ -325,6 +326,8 @@ impl ExecutionContext<'_> {
                 }
                 _ => panic!("LoadViewTko indices must be tile values"),
             }
+
+        debug!("LoadViewTko: index[0] (X)={}, index[1] (Y)={}", indices[0], if indices.len() > 1 { indices[1] } else { -1 });
         }
 
         // Load tile based on view type
@@ -375,6 +378,8 @@ impl ExecutionContext<'_> {
         match view_value {
             Value::PartitionView(pv) => {
                 pv.store_tile(&indices, &tile);
+        debug!("StoreViewTko: indices = {:?}", indices);
+        debug!("StoreViewTko: index[0] (X)={}, index[1] (Y)={}", indices[0], if indices.len() > 1 { indices[1] } else { -1 });
             }
             _ => panic!("StoreViewTko view must be PartitionView"),
         }

@@ -8,6 +8,7 @@
 
 use crate::cuda_tile_ir::enums::{ComparisonOrdering, ComparisonPredicate};
 use crate::interpreter::data_structures::tile::Tile;
+use log::debug;
 use ndrange::ndrange;
 use rand::{RngExt, SeedableRng};
 
@@ -1192,7 +1193,7 @@ fn test_mmaf_f16_f32_large_random() {
                         expected,
                         arr[[i, j]]
                     );
-                    println!(
+                    debug!(
                         "[{}, {}] expected: {}, actual: {}",
                         i,
                         j,

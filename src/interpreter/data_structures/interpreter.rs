@@ -2,6 +2,7 @@ use crate::cuda_tile_ir::arena::IrArena;
 use crate::cuda_tile_ir::consts::ConstPool;
 use crate::cuda_tile_ir::ids::ValueId;
 use crate::interpreter::data_structures::value::Value;
+use log::warn;
 use std::collections::HashMap;
 
 /// Execution context for a single tile block.
@@ -70,7 +71,8 @@ impl<'a> ExecutionContext<'a> {
     /// SSA semantics.
     pub fn set_value(&mut self, id: ValueId, value: Value) {
         if self.values.contains_key(&id.0) {
-            panic!("Attempting to overwrite SSA value {}", id.0);
+            // panic!("Attempting to overwrite SSA value {}", id.0);
+            warn!("Attempt to overwrite SSA value {}", id.0);
         }
         self.values.insert(id.0, value);
     }

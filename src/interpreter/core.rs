@@ -7,6 +7,8 @@ use crate::interpreter::data_structures::elem_type::ElemType;
 use crate::interpreter::data_structures::interpreter::ExecutionContext;
 use crate::interpreter::data_structures::tile::Tile;
 use crate::interpreter::data_structures::value::Value;
+use log::debug;
+use log::trace;
 use ndarray::{Array, IxDyn, SliceInfo, SliceInfoElem};
 use std::collections::HashSet;
 
@@ -265,6 +267,7 @@ impl ExecutionContext<'_> {
     }
 
     pub fn execute_get_tile_block_id(&mut self, op: &Operation) {
+        debug!("GetTileBlockId: tile_block_id = {:?}", self.tile_block_id);
         let [bx, by, bz] = self.tile_block_id;
 
         let x_tile = Tile::I32(ndarray::Array::from_elem(ndarray::IxDyn(&[]), bx as i32));
@@ -272,6 +275,7 @@ impl ExecutionContext<'_> {
         let z_tile = Tile::I32(ndarray::Array::from_elem(ndarray::IxDyn(&[]), bz as i32));
 
         self.set_value(op.results[0], Value::Tile(x_tile));
+        trace!("GetTileBlockId: returning X={}, Y={}, Z={}", bx, by, bz);
         self.set_value(op.results[1], Value::Tile(y_tile));
         self.set_value(op.results[2], Value::Tile(z_tile));
     }

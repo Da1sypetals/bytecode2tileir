@@ -1,6 +1,8 @@
 //! bytecode2mlir - Convert Tile IR bytecode to MLIR text format
 
 use clap::Parser;
+use log::error;
+use log::info;
 use std::fs;
 use std::path::PathBuf;
 
@@ -21,6 +23,11 @@ struct Args {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
+    // Initialize logger
+    env_logger::Builder::from_default_env()
+        .filter_level(log::LevelFilter::Info)
+        .init();
+
     let output = args.output.unwrap_or_else(|| {
         let mut p = args.input.clone();
         p.set_extension("mlir");
@@ -30,8 +37,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Check if it's a valid bytecode file
     let data = fs::read(&args.input)?;
     if !bytecode2mlir::bytecode::is_tilir_bytecode(&data) {
-        eprintln!(
-            "Error: '{}' is not a valid TileIR bytecode file",
+        error!(
+            "'{}' is not a valid TileIR bytecode file",
             args.input.display()
         );
         std::process::exit(1);
@@ -50,7 +57,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Write to output file
     fs::write(&output, mlir_text)?;
-    eprintln!("Successfully wrote MLIR to: {}", output.display());
+    info!("Successfully wrote MLIR to: {}", output.display());
 
     Ok(())
 }
