@@ -1,7 +1,9 @@
+use crate::interpreter::tests::test_interpreter::logging_utils::init_test_logger;
 use crate::interpreter::{
     args::{KernelArgv, KernelGenericArgv},
     data_structures::interpreter::Interpreter,
 };
+use core::f32;
 use indicatif::ProgressIterator;
 use log::info;
 use ndarray::Array2;
@@ -9,9 +11,14 @@ use ndrange::ndrange;
 use rand::RngExt;
 use std::path::Path;
 
-fn rand_2d(row: usize, col: usize) -> Array2<f16> {
+fn rand_2d_f16(row: usize, col: usize) -> Array2<f16> {
     let mut rng = rand::rng();
     Array2::from_elem([row, col], 0.0_f16).mapv_into(|_| rng.random_range(0.0..1.0_f32) as f16)
+}
+
+fn rand_2d_f32(row: usize, col: usize) -> Array2<f32> {
+    let mut rng = rand::rng();
+    Array2::from_elem([row, col], 0.0_f32).mapv_into(|_| rng.random_range(0.0..1.0_f32))
 }
 
 //   - %0: base pointer of A
@@ -34,22 +41,19 @@ fn rand_2d(row: usize, col: usize) -> Array2<f16> {
 //   - %17: columns of A / rows of B (K, duplicate)
 #[test]
 fn test_matmul_1() {
-    use crate::interpreter::tests::test_interpreter::logging_utils::init_test_logger;
-
     init_test_logger();
 
-    let bytecode_path = Path::new("test_samples").join("matmul.tileirbc");
+    let bytecode_path = Path::new("test_samples").join("mm.tileirbc");
     let mut intp = Interpreter::from_module(bytecode_path);
 
-    let [m, n, k] = [512, 256, 64];
+    let [m, n, k] = [128, 64, 128];
 
     // Consistent with TileIR
-    let [tm, tn, tk] = [128, 128, 32];
+    let [tm, tn, tk] = [64, 32, 16];
 
-    let a = rand_2d(m, k);
-    let b = rand_2d(k, n);
-    let c = Array2::from_elem([m, n], 0.0_f16);
-    let mut c_ref = Array2::from_elem([m, n], 0.0_f16);
+    let a = rand_2d_f16(m, k);
+    let b = rand_2d_f16(k, n);
+    let c = Array2::<f32>::zeros([m, n]);
 
     let args = KernelArgv::new()
         .and(a.as_ptr() as *mut u8)
@@ -74,18 +78,28 @@ fn test_matmul_1() {
     let grid_size = [m / tm, n / tn, 1];
     intp.execute(args, grid_size);
 
+    let mut max_diff = f32::MIN;
+    let mut max_diff_idx = [-1, -1];
+    let mut max_diff_real_val = None;
     for [i_m, i_n] in ndrange(&[m, n]).progress() {
-        for i_k in 0..k {
-            c_ref[[i_m, i_n]] += a[[i_m, i_k]] * b[[i_k, i_n]];
+        let c_ref = (0..k).map(|i_k| a[[i_m, i_k]] * b[[i_k, i_n]]).sum::<f16>() as f32;
+
+        let diff = (c[[i_m, i_n]] - c_ref).abs();
+        if diff > max_diff {
+            max_diff = diff;
+            max_diff_idx = [i_m as isize, i_n as isize];
+            max_diff_real_val = Some(c_ref);
         }
-        // info!(
-        //     "Difference at [{}, {}] : {} ; actual({}), expected({})",
-        //     i_m,
-        //     i_n,
-        //     (c[[i_m, i_n]] - c_ref[[i_m, i_n]]).abs(),
-        //     c[[i_m, i_n]],
-        //     c_ref[[i_m, i_n]]
-        // );
+
+        info!(
+            "Difference at [{}, {}] : {} ; actual({}), expected({})",
+            i_m,
+            i_n,
+            diff,
+            c[[i_m, i_n]],
+            c_ref
+        );
+
         // assert!(
         //     c_ref[[i_m, i_n]] == c[[i_m, i_n]],
         //     "Mismatch at [{}, {}] : actual({}) != expected({})",
@@ -95,4 +109,6 @@ fn test_matmul_1() {
         //     c_ref[[i_m, i_n]]
         // );
     }
+
+    println!("Max diff: {max_diff} at {max_diff_idx:?}, real value = {max")
 }
