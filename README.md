@@ -1,12 +1,5 @@
-```
-Convert Tile IR bytecode to MLIR text format
+# Tiri: Tile IR Interpreter
 
-Usage: bytecode2mlir <INPUT> <OUTPUT>
-
-Arguments:
-  <INPUT>   Input TileIR bytecode file
-  <OUTPUT>  Output MLIR file
-
-Options:
-  -h, --help  Print help
+```bash
+cargo test test_matmul_1 -- --nocapture
 ```
