@@ -1,15 +1,13 @@
-use std::path::Path;
-
-use indicatif::ProgressIterator;
-use ndarray::Array2;
-use ndrange::ndrange;
-use rand::RngExt;
-
 use crate::interpreter::{
     args::{KernelArgv, KernelGenericArgv},
     data_structures::interpreter::Interpreter,
 };
+use indicatif::ProgressIterator;
 use log::info;
+use ndarray::Array2;
+use ndrange::ndrange;
+use rand::RngExt;
+use std::path::Path;
 
 fn rand_2d(row: usize, col: usize) -> Array2<f16> {
     let mut rng = rand::rng();
@@ -80,7 +78,7 @@ fn test_matmul_1() {
         for i_k in 0..k {
             c_ref[[i_m, i_n]] += a[[i_m, i_k]] * b[[i_k, i_n]];
         }
-        // println!(
+        // info!(
         //     "Difference at [{}, {}] : {} ; actual({}), expected({})",
         //     i_m,
         //     i_n,
