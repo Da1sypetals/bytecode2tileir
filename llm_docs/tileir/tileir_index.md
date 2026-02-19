@@ -1,0 +1,3 @@
+- Type system: llm_docs/tileir/types.md
+- Semantics: llm_docs/tileir/semantics.md
+- General guides on Tile IR design and types: llm_docs/tileir/general.md
