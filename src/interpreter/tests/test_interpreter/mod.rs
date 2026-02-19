@@ -1,3 +1,4 @@
+mod attention;
 mod simple;
 
 #[cfg(test)]

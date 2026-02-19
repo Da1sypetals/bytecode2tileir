@@ -4,9 +4,11 @@ use crate::cuda_tile_ir::ir::Operation;
 use crate::cuda_tile_ir::types::{Dim, Type};
 use crate::interpreter;
 use crate::interpreter::data_structures::elem_type::ElemType;
+use crate::interpreter::data_structures::elem_type::Scalar;
 use crate::interpreter::data_structures::interpreter::ExecutionContext;
 use crate::interpreter::data_structures::tile::Tile;
 use crate::interpreter::data_structures::value::Value;
+use crate::interpreter::entry::ControlFlow;
 use log::debug;
 use log::trace;
 use ndarray::{Array, IxDyn, SliceInfo, SliceInfoElem};
@@ -725,63 +727,65 @@ impl Tile {
                     .into_shape_with_order(IxDyn(result_shape))
                     .unwrap()
                     .as_standard_layout()
-                    .to_owned(),
+                    .to_owned()
+                    .into_shape_with_order(IxDyn(result_shape))
+                    .unwrap(),
             ),
             Tile::I8(arr) => Tile::I8(
                 arr.clone()
-                    .into_shape_with_order(IxDyn(result_shape))
-                    .unwrap()
                     .as_standard_layout()
-                    .to_owned(),
+                    .to_owned()
+                    .into_shape_with_order(IxDyn(result_shape))
+                    .unwrap(),
             ),
             Tile::I16(arr) => Tile::I16(
                 arr.clone()
-                    .into_shape_with_order(IxDyn(result_shape))
-                    .unwrap()
                     .as_standard_layout()
-                    .to_owned(),
+                    .to_owned()
+                    .into_shape_with_order(IxDyn(result_shape))
+                    .unwrap(),
             ),
             Tile::I32(arr) => Tile::I32(
                 arr.clone()
-                    .into_shape_with_order(IxDyn(result_shape))
-                    .unwrap()
                     .as_standard_layout()
-                    .to_owned(),
+                    .to_owned()
+                    .into_shape_with_order(IxDyn(result_shape))
+                    .unwrap(),
             ),
             Tile::I64(arr) => Tile::I64(
                 arr.clone()
-                    .into_shape_with_order(IxDyn(result_shape))
-                    .unwrap()
                     .as_standard_layout()
-                    .to_owned(),
+                    .to_owned()
+                    .into_shape_with_order(IxDyn(result_shape))
+                    .unwrap(),
             ),
             Tile::F16(arr) => Tile::F16(
                 arr.clone()
-                    .into_shape_with_order(IxDyn(result_shape))
-                    .unwrap()
                     .as_standard_layout()
-                    .to_owned(),
+                    .to_owned()
+                    .into_shape_with_order(IxDyn(result_shape))
+                    .unwrap(),
             ),
             Tile::F32(arr) => Tile::F32(
                 arr.clone()
-                    .into_shape_with_order(IxDyn(result_shape))
-                    .unwrap()
                     .as_standard_layout()
-                    .to_owned(),
+                    .to_owned()
+                    .into_shape_with_order(IxDyn(result_shape))
+                    .unwrap(),
             ),
             Tile::F64(arr) => Tile::F64(
                 arr.clone()
-                    .into_shape_with_order(IxDyn(result_shape))
-                    .unwrap()
                     .as_standard_layout()
-                    .to_owned(),
+                    .to_owned()
+                    .into_shape_with_order(IxDyn(result_shape))
+                    .unwrap(),
             ),
             Tile::Ptr(arr) => Tile::Ptr(
                 arr.clone()
-                    .into_shape_with_order(IxDyn(result_shape))
-                    .unwrap()
                     .as_standard_layout()
-                    .to_owned(),
+                    .to_owned()
+                    .into_shape_with_order(IxDyn(result_shape))
+                    .unwrap(),
             ),
         }
     }

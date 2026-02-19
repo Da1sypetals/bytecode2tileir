@@ -110,5 +110,6 @@ fn test_matmul_1() {
         // );
     }
 
-    println!("Max diff: {max_diff} at {max_diff_idx:?}, real value = {max_diff_real_val:?}")
+    println!();
+    info!("Max diff: {max_diff} at {max_diff_idx:?}, real value = {max_diff_real_val:?}")
 }
